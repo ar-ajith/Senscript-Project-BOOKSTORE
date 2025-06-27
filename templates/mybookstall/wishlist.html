@@ -1,0 +1,254 @@
+{% extends "mybookstall/base.html" %}
+{% load static %}
+{% block content %}
+
+
+<style>
+    #shop{
+        padding-bottom:10%;
+    }
+  .product-div{
+    padding-top:3%;
+    padding-bottom:20%;
+  }
+  .product-card {
+    background-color: #fff;
+    padding: 15px 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-thumbnail {
+    height: 250px;
+    object-fit: cover;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.product-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 10px 0 5px;
+    min-height: 2.5em; /* Keep title area aligned */
+}
+
+.product-price {
+    font-size: 1rem;
+    margin: 10px 0;
+}
+
+.rating-stars i {
+    font-size: 0.85rem;
+}
+
+.icon-cross img {
+    width: 24px;
+    height: 24px;
+}
+
+    #text{
+                font-size:40px;
+                font-family: "Fontdiner Swanky", serif;
+                font-weight: 400;
+                font-style: normal;
+                color:white;
+            }
+                #text1{
+                font-size:40px;
+                font-family: "Fontdiner Swanky", serif;
+                font-weight: 400;
+                font-style: normal;
+                color:black;
+            }
+    .container a{
+      text-decoration:none;
+    }     
+
+
+
+        /* wishlist page styles */
+
+
+        .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    .btn-outline-danger {
+        border-radius: 30px;
+        padding: 6px 15px;
+    }
+    #shop h2{
+        color:black;
+        padding-top:2%;
+    }
+    #bookdiv{
+        width:250px;
+    }
+
+    
+</style>
+
+        <nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
+
+			<div class="container">
+				<a class="app-logo" href="{% url 'user_dashboard' %}"><img class="logo-icon me-2" src="{% static 'img/logo.png' %}" alt="logo">
+                        <span class="logo-text" id='text'>Book Store</span>
+                    </a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+
+				<div class="collapse navbar-collapse" id="navbarsFurni">
+					<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+						<li>
+							<a class="nav-link" href="{% url 'user_dashboard' %}">Home</a>
+						</li>
+						<li class="nav-item "><a class="nav-link" href="{% url 'shop' %}">Shop</a></li>
+						<li><a class="nav-link" href="{% url 'about' %}">About us</a></li>
+						<li><a class="nav-link" href="{% url 'services' %}">Services</a></li>
+						<li><a class="nav-link" href="{% url 'blog' %}">Blog</a></li>
+						<li><a class="nav-link" href="{% url 'contact' %}">Contact us</a></li>
+					</ul>
+
+<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+  <!-- Cart icon -->
+<li>
+    <a class="nav-link" href="{% url 'cartview' %}">
+      <img src="{% static 'mybookstall/img/cart.svg' %}" alt="Cart">
+      <span id="cart-count" class="badge bg-danger">
+        {% if request.user.is_authenticated %}
+    {{ request.user.cart.items.count }}
+{% else %}
+    0
+{% endif %}
+
+      </span>
+    </a>
+</li>
+<li class="nav-item position-relative">
+  <a class="nav-link {% if request.resolver_match.url_name == 'wishlist_view' %}active{% endif %}" 
+     href="{% url 'wishlist_view' %}">
+    <img src="{% static 'mybookstall/img/heart.png' %}" alt="Wishlist" style="width: 32px; margin-right: 20px;">
+    <span id="wishlist-count" class="badge bg-warning">
+      {% if request.user.is_authenticated %}
+        {{ request.user.wishlist.count }}
+      {% else %}
+        0
+      {% endif %}
+    </span>
+  </a>
+</li>
+
+  {% if user.is_authenticated %}
+  <!-- User dropdown when logged in -->
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <img src="{% static 'mybookstall/img/user.svg' %}" alt="User">
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+      <li><a class="dropdown-item" href="{% url 'user_profile' %}">Profile</a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-danger" href="{% url 'user_logout' %}">Logout</a></li>
+    </ul>
+  </li>
+  {% else %}
+  <!-- Show Login link if not logged in -->
+ <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <img src="{% static 'mybookstall/img/user.svg' %}" alt="User">
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-danger" href="{% url 'user_login' %}">Login</a></li>
+    </ul>
+  </li>
+  {% endif %}
+</ul>
+
+				</div>
+			</div>
+		</nav>
+<div class="container" id="shop">
+    <h2 class="mb-4 fw-bold text-center">Your Wishlist</h2>
+
+    <div class="row">
+        {% for item in wishlist_items %}
+        <div class="col-md-4 mb-4" id="bookdiv">
+            <div class="card h-100 shadow-sm">
+                <a href="{% url 'BookDetail' item.book.id %}" class="text-decoration-none text-dark">
+                    <div class="image-wrapper text-center p-3 bg-light">
+                        <img src="{{ item.book.image.url }}" class="img-fluid product-thumbnail" alt="{{ item.book.title }}">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="product-title text-center">{{ item.book.title }}</h5>
+
+                        <!-- ⭐ Rating -->
+                        <div class="rating-stars mb-2 text-center text-warning">
+                            {% with total=item.book.average_rating|default:0 %}
+                                {% for i in "12345"|make_list %}
+                                    {% if total|floatformat:1 >= forloop.counter %}
+                                        <i class="fas fa-star"></i>
+                                    {% elif total|floatformat:1 >= forloop.counter0|add:"0.5" %}
+                                        <i class="fas fa-star-half-alt"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                        </div>
+
+                        <!-- Price -->
+                        <div class="text-center">
+                            {% if item.book.discounted_price and item.book.discounted_price < item.book.price %}
+                                <p class="product-price mb-0">
+                                    <del class="text-muted">${{ item.book.price }}</del>
+                                    <strong class="text-success ms-2">${{ item.book.discounted_price }}</strong><br>
+                                    <span class="badge bg-danger mt-1">-{{ item.book.discount_percent }}%</span>
+                                </p>
+                            {% else %}
+                                <strong class="product-price">${{ item.book.price }}</strong>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 🗑 Remove Button -->
+                <div class="card-footer text-center bg-white border-top-0">
+                    <form method="POST" action="{% url 'remove_from_wishlist' item.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger btn-sm mt-2">
+                            <i class="fas fa-trash-alt"></i> Remove
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted fs-5">You have no items in your wishlist.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+
+{% endblock %}        
+
+

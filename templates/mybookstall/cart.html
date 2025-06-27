@@ -1,0 +1,571 @@
+{% extends 'mybookstall/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+  #shop{
+        padding-bottom:15%;
+    }
+  .product-div{
+    padding-top:3%;
+    padding-bottom:20%;
+  }
+  .product-card {
+    background-color: #fff;
+    padding: 15px 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-thumbnail {
+    height: 250px;
+    object-fit: cover;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.product-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 10px 0 5px;
+    min-height: 2.5em; 
+}
+
+.product-price {
+    font-size: 1rem;
+    margin: 10px 0;
+}
+
+.rating-stars i {
+    font-size: 0.85rem;
+}
+
+.icon-cross img {
+    width: 24px;
+    height: 24px;
+}
+
+    #text{
+                font-size:40px;
+                font-family: "Fontdiner Swanky", serif;
+                font-weight: 400;
+                font-style: normal;
+                color:white;
+            }
+                #text1{
+                font-size:40px;
+                font-family: "Fontdiner Swanky", serif;
+                font-weight: 400;
+                font-style: normal;
+                color:black;
+            }
+    .container a{
+      text-decoration:none;
+    }     
+        
+/* cart page styles */
+
+    #th-img{
+    }
+</style>
+
+        <nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
+
+			<div class="container">
+				<a class="app-logo" href="{% url 'user_dashboard' %}"><img class="logo-icon me-2" src="{% static 'img/logo.png' %}" alt="logo">
+                        <span class="logo-text" id='text'>Book Store</span>
+                    </a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+
+				<div class="collapse navbar-collapse" id="navbarsFurni">
+					<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+						<li>
+							<a class="nav-link" href="{% url 'user_dashboard' %}">Home</a>
+						</li>
+						<li class="nav-item"><a class="nav-link" href="{% url 'shop' %}">Shop</a></li>
+						<li><a class="nav-link" href="{% url 'about' %}">About us</a></li>
+						<li><a class="nav-link" href="{% url 'services' %}">Services</a></li>
+						<li><a class="nav-link" href="{% url 'blog' %}">Blog</a></li>
+						<li><a class="nav-link" href="{% url 'contact' %}">Contact us</a></li>
+					</ul>
+
+<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+  <!-- Cart icon -->
+<li>
+    <a class="nav-link" href="{% url 'cartview' %}">
+      <img src="{% static 'mybookstall/img/cart.svg' %}" alt="Cart">
+      <span id="cart-count" class="badge bg-danger">
+        {% if request.user.is_authenticated %}
+    {{ request.user.cart.items.count }}
+{% else %}
+    0
+{% endif %}
+
+      </span>
+    </a>
+</li>
+<li class="nav-item position-relative">
+  <a class="nav-link {% if request.resolver_match.url_name == 'wishlist_view' %}active{% endif %}" 
+     href="{% url 'wishlist_view' %}">
+    <img src="{% static 'mybookstall/img/heart.png' %}" alt="Wishlist" style="width: 32px; margin-right: 20px;">
+    <span id="wishlist-count" class="badge bg-warning">
+      {% if request.user.is_authenticated %}
+        {{ request.user.wishlist.count }}
+      {% else %}
+        0
+      {% endif %}
+    </span>
+  </a>
+</li>
+
+  {% if user.is_authenticated %}
+  <!-- User dropdown when logged in -->
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <img src="{% static 'mybookstall/img/user.svg' %}" alt="User">
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+      <li><a class="dropdown-item" href="{% url 'user_profile' %}">Profile</a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-danger" href="{% url 'user_logout' %}">Logout</a></li>
+    </ul>
+  </li>
+  {% else %}
+  <!-- Show Login link if not logged in -->
+ <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <img src="{% static 'mybookstall/img/user.svg' %}" alt="User">
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-danger" href="{% url 'user_login' %}">Login</a></li>
+    </ul>
+  </li>
+  {% endif %}
+</ul>
+
+				</div>
+			</div>
+		</nav>
+    <div>
+  <div class="container" id="shop">
+    <div class="row mb-5">
+      <form method="post" action="{% url 'cart_update' %}" class="col-md-12">
+        {% csrf_token %}
+        <div class="site-blocks-table">
+          <table class="table">
+            <thead>
+              <tr>
+                <th class="product-thumbnail">Image</th>
+                <th class="product-name">Product</th>
+                <th class="product-price">Price</th>
+                <th class="product-quantity">Quantity</th>
+                <th class="product-total">Total</th>
+                <th class="product-remove">Remove</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if cart_items %}
+                {% for item in cart_items %}
+                  <tr>
+                    <td class="product-thumbnail">
+                      <img src="{{ item.book.image.url }}" alt="{{ item.book.title }}" class="img-fluid" style="max-width: 80px;">
+                    </td>
+                    <td class="product-name">
+                      <h2 class="h5 text-black">{{ item.book.title }}</h2>
+                    </td>
+                    <td class="text-black">${{ item.book.discounted_price|floatformat:2 }}</td>
+                    <td>
+                      <div class="input-group quantity-container" style="max-width: 140px;">
+                        <button class="btn btn-outline-dark decrease" type="button">&minus;</button>
+                        <input
+                          type="number"
+                          name="quantity_{{ item.book.id }}"
+                          value="{{ item.quantity }}"
+                          min="1"
+                          max="{{ item.book.quantity }}"
+                          data-max="{{ item.book.quantity }}"
+                          class="form-control text-center quantity-input"
+                          data-id="{{ item.book.id }}"
+                        />
+                        <button class="btn btn-outline-dark increase" type="button">&plus;</button>
+                      </div>
+                    </td>
+                    <td class="product-total" data-book-id="{{ item.book.id }}">
+                      ${{ item.total_price|floatformat:2 }}
+                    </td>
+                    <td>
+                      <a href="{% url 'cart_remove' item.id %}" class="btn btn-black btn-sm">X</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr><td colspan="6" class="text-center">Your cart is empty.</td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="row mb-5"></form>
+          <div class="col-md-6">
+            <a href="{% url 'cartview' %}" class="btn btn-outline-black btn-sm btn-block">Update Cart</a>
+          </div>
+          <div class="col-md-6">
+            <a href="{% url 'shop' %}" class="btn btn-outline-black btn-sm btn-block">Continue Shopping</a>
+          </div>
+          
+        </div>
+        <div class="row mb-4">
+  <div class="col-md-12">
+    <label class="text-black h5" for="shipping_address">Select Shipping Address</label>
+<select id="shipping_address" class="form-control" required>
+  <option value="">Choose an address</option>
+  {% for address in shipping_addresses %}
+    <option value="{{ address.id }}"
+            data-pincode="{{ address.shipping_pincodes }}"
+            data-deliverable="{{ address.is_deliverable|yesno:'true,false' }}">
+      {{ address.shipping_addresses }}, {{ address.city }}, {{ address.district }} - {{ address.shipping_pincodes }}
+    </option>
+  {% endfor %}
+</select>
+
+
+
+  </div>
+</div>
+
+
+        <!-- Coupon Section -->
+        <div class="row">
+          <div class="col-md-12">
+            <label class="text-black h4" for="coupon-code">Coupon</label>
+            <p>Enter your coupon code if you have one.</p>
+          </div>
+          <div class="col-md-8 mb-3 mb-md-0">
+            <input type="text" class="form-control py-3" id="coupon-code" name="coupon_code" placeholder="Coupon Code">
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-black" id="apply-coupon-btn">Apply Coupon</button>
+            <p id="coupon-message" class="mt-2"></p>
+          </div>
+        </div>
+
+        <!-- Dynamic Coupon Area -->
+        <div id="coupon-section">
+          {% if coupon %}
+            <p>Coupon Applied: {{ coupon.code }} - You saved ${{ coupon.discount }}</p>
+            <button id="remove-coupon-btn" class="btn btn-outline-black btn-sm btn-block">Remove Coupon</button>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Totals Section -->
+      <div class="col-md-6 pl-5">
+        <div class="row justify-content-end">
+          <div class="col-md-7">
+            <div class="row">
+              <div class="col-md-12 text-right border-bottom mb-5">
+                <h3 class="text-black h4 text-uppercase">Cart Totals</h3>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">Total</div>
+              <div class="col-md-6 text-right">
+                <strong class="text-black">${{ total|floatformat:2 }}</strong>
+              </div>
+            </div>
+
+            {% if coupon %}
+              <div class="row mb-3" id="discount-row">
+                <div class="col-md-6">Discounted Total</div>
+                <div class="col-md-6 text-right">
+                  <strong id="total-amount" class="text-success">${{ discounted_total|floatformat:2 }}</strong>
+                </div>
+              </div>
+            {% else %}
+              <div class="row mb-3" id="discount-row" style="display: none;">
+                <div class="col-md-6">Discounted Total</div>
+                <div class="col-md-6 text-right">
+                  <strong id="total-amount" class="text-success"></strong>
+                </div>
+              </div>
+            {% endif %}
+
+            <div id="delivery-warning" class="text-danger mt-2"></div>
+
+          <div class="row mt-3">
+            <div class="col-md-12">
+              <a href="{% url 'checkout' %}" id="checkout-btn" class="btn btn-black btn-lg py-3 btn-block">Proceed To Checkout</a>
+            </div>
+          </div>
+
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- Styled Popup Toast -->
+<div id="custom-toast" style="display:none; position: fixed; top: 30px; right: 30px; z-index: 9999;">
+  <div style="background-color: #dc3545; color: white; padding: 15px 20px; border-radius: 5px; box-shadow: 0 5px 10px rgba(0,0,0,0.2); font-weight: 500;">
+    <span id="toast-message"></span>
+    <button onclick="hideToast()" style="background: none; border: none; color: white; float: right; font-size: 18px; margin-left: 10px;">&times;</button>
+  </div>
+</div>
+
+<!--end toast cart-->
+
+    <script>
+function showToast(message) {
+  const toast = document.getElementById("custom-toast");
+  const toastMsg = document.getElementById("toast-message");
+  toastMsg.innerText = message;
+  toast.style.display = "block";
+
+  // Auto-hide after 3 seconds
+  setTimeout(() => {
+    toast.style.display = "none";
+  }, 3000);
+}
+
+function hideToast() {
+  document.getElementById("custom-toast").style.display = "none";
+}
+</script>
+
+<!-- Quantity JS -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".quantity-container").forEach(container => {
+    const input = container.querySelector(".quantity-input");
+    const increaseBtn = container.querySelector(".increase");
+    const decreaseBtn = container.querySelector(".decrease");
+
+    const maxQty = parseInt(input.dataset.max);
+    const bookId = input.dataset.id;
+
+    function updateCartQuantity(newQty) {
+      const csrfToken = getCookie('csrftoken');
+
+      fetch("{% url 'cart_update' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({
+          book_id: bookId,
+          quantity: newQty
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const itemTotalElem = document.querySelector(`.product-total[data-book-id='${bookId}']`);
+          if (itemTotalElem) {
+            itemTotalElem.textContent = `$${data.item_total.toFixed(2)}`;
+          }
+
+          document.getElementById("total-amount").textContent = `$${data.cart_total.toFixed(2)}`;
+        } else {
+          alert(data.message || "Update failed.");
+        }
+      });
+    }
+
+    increaseBtn.addEventListener("click", () => {
+      let qty = parseInt(input.value);
+      if (qty < maxQty) {
+        qty += 1;
+        input.value = qty;
+        updateCartQuantity(qty);
+      } else {
+        showToast(`You can only order up to ${maxQty} units of this book.`);
+        input.value = maxQty;
+      }
+    });
+
+    decreaseBtn.addEventListener("click", () => {
+      let qty = parseInt(input.value);
+      if (qty > 1) {
+        qty -= 1;
+        input.value = qty;
+        updateCartQuantity(qty);
+      } else {
+        input.value = 1;
+      }
+    });
+
+    input.addEventListener("change", () => {
+      let val = parseInt(input.value);
+      if (val > maxQty) {
+        alert(`You can only order up to ${maxQty} units of this book.`);
+        input.value = maxQty;
+        val = maxQty;
+      } else if (val < 1 || isNaN(val)) {
+        input.value = 1;
+        val = 1;
+      }
+      updateCartQuantity(val);
+    });
+  });
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+});
+</script>
+
+<script>
+document.getElementById("apply-coupon-btn").addEventListener("click", function () {
+  const couponCode = document.getElementById("coupon-code").value;
+  const csrfToken = getCookie("csrftoken");
+
+  fetch("/apply-coupon/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken
+    },
+    body: JSON.stringify({ coupon_code: couponCode })
+  })
+    .then(response => response.json())
+    .then(data => {
+      const msgElem = document.getElementById("coupon-message");
+      if (data.success) {
+        document.getElementById("total-amount").innerText = `$${data.discounted_total.toFixed(2)}`;
+        document.getElementById("discount-row").style.display = "flex";
+
+        const originalAmountElem = document.querySelector('.text-black');
+        let originalAmount = 0;
+        if (originalAmountElem) {
+          const amountText = originalAmountElem.innerText.replace('$', '').trim();
+          originalAmount = parseFloat(amountText) || 0;
+        }
+
+        const savings = (originalAmount - data.discounted_total).toFixed(2);
+
+        document.getElementById("coupon-section").innerHTML = `
+          <button id="remove-coupon-btn" class="btn btn-outline-black btn-sm btn-block">Remove Coupon</button>
+        `;
+
+        bindRemoveCoupon();
+
+        msgElem.innerText = data.message;
+        msgElem.style.color = "green";
+      } else {
+        msgElem.innerText = data.message;
+        msgElem.style.color = "red";
+      }
+    });
+});
+
+
+function bindRemoveCoupon() {
+  const btn = document.getElementById('remove-coupon-btn');
+  if (btn) {
+    btn.addEventListener('click', function () {
+      fetch("{% url 'remove_coupon' %}", {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}',
+          'Content-Type': 'application/json',
+        },
+      }).then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            location.reload(); 
+          }
+        });
+    });
+  }
+}
+
+bindRemoveCoupon();
+
+</script>
+
+<script>
+  const addressSelect = document.getElementById('shipping_address');
+  const warningDiv = document.getElementById('delivery-warning');
+  const checkoutBtn = document.getElementById('checkout-btn');
+
+  function validateDelivery() {
+    const selectedOption = addressSelect.options[addressSelect.selectedIndex];
+    const isDeliverable = selectedOption?.dataset.deliverable === 'true';
+
+    if (!selectedOption.value) {
+      warningDiv.textContent = "Please select an address.";
+      checkoutBtn.classList.add("disabled");
+      checkoutBtn.style.pointerEvents = "none";
+      return;
+    }
+
+    const csrfToken = getCookie("csrftoken");
+    fetch("{% url 'save_shipping_address' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      body: JSON.stringify({ address_id: selectedOption.value })
+    });
+
+    if (!isDeliverable) {
+      warningDiv.textContent = "Sorry, some books in your cart cannot be delivered to this address.";
+      checkoutBtn.classList.add("disabled");
+      checkoutBtn.style.pointerEvents = "none";
+    } else {
+      warningDiv.textContent = "";
+      checkoutBtn.classList.remove("disabled");
+      checkoutBtn.style.pointerEvents = "auto";
+    }
+  }
+
+  addressSelect.addEventListener('change', validateDelivery);
+  document.addEventListener('DOMContentLoaded', validateDelivery);
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
+
+
+{% endblock %}        

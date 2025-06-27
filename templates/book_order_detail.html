@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
+    <ul class="app-menu list-unstyled accordion" id="menu-accordion">
+        <li class="nav-item">
+            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+            <a class="nav-link" href="{% url 'admindashboard' %}">
+                <span class="nav-icon">
+                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-house-door" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" d="M7.646 1.146a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 .146.354v7a.5.5 0 0 1-.5.5H9.5a.5.5 0 0 1-.5-.5v-4H7v4a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .146-.354l6-6zM2.5 7.707V14H6v-4a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4h3.5V7.707L8 2.207l-5.5 5.5z"/>
+<path fill-rule="evenodd" d="M13 2.5V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+</svg>
+                 </span>
+                 <span class="nav-link-text">Dashboard</span>
+            </a><!--//nav-link-->
+        </li><!--//nav-item-->
+        {% if request.user.role == 'admin' %}
+        <li class="nav-item">
+            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+            <a class="nav-link" href="{% url 'seller_list' %}">
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" fill="currentColor" class="bi bi-person-badge" viewBox="0 0 16 16">
+                        <path d="M6.5 2a2.5 2.5 0 0 0 0 5 2.5 2.5 0 0 0 0-5zM3 6.5a3.5 3.5 0 1 1 7 0A3.5 3.5 0 0 1 3 6.5z"/>
+                        <path d="M7 9a4 4 0 0 0-4 4v1h8v-1a4 4 0 0 0-4-4zM2 13a5 5 0 0 1 10 0v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1z"/>
+                        <path d="M11.5 1a.5.5 0 0 1 .5.5v2l.5-.5a.5.5 0 0 1 .708.707l-1.5 1.5a.5.5 0 0 1-.708 0l-1.5-1.5A.5.5 0 0 1 9.5 3l.5.5v-2a.5.5 0 0 1 .5-.5z"/>
+                      </svg>
+                 </span>
+                 <span class="nav-link-text">Sellers</span>
+            </a><!--//nav-link-->
+        </li><!--//nav-item-->
+        <li class="nav-item">
+            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+            <a class="nav-link " href="{% url 'user_list' %}">
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="user-icon" width="1.5em" height="1.5em" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                        <path d="M2 14s-1 0-1-1 1-4 7-4 7 3 7 4-1 1-1 1H2z"/>
+                    </svg>
+                 </span>
+                 <span class="nav-link-text">Users</span>
+            </a><!--//nav-link-->
+        </li><!--//nav-item-->
+        {% endif %}
+        <li class="nav-item">
+            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+            <a class="nav-link" href="{% url 'seller_books_status' %}">
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-book-half" viewBox="0 0 16 16">
+                        <path d="M8.5 2.687c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783"/>
+                      </svg>
+                 </span>
+                 <span class="nav-link-text">Book Status</span>
+            </a><!--//nav-link-->
+        </li><!--//nav-item-->
+        <li class="nav-item has-submenu">
+            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+            <a class="nav-link submenu-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#submenu-1" aria-expanded="false" aria-controls="submenu-1">
+                <span class="nav-icon">
+                <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-journal-check" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M10.854 6.146a.5.5 0 0 1 0 .708l-2.5 2.5a.5.5 0 0 1-.708 0L6.146 8.854a.5.5 0 1 1 .708-.708L8 9.293l2.146-2.147a.5.5 0 0 1 .708 0z"/>
+                    <path d="M3 0h10a1 1 0 0 1 1 1v13.5a.5.5 0 0 1-.5.5H3a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm10 1H3a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h10V1z"/>
+                    <path d="M3 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6A.5.5 0 0 1 3 2.5z"/>
+                  </svg>
+                 </span>
+                 <span class="nav-link-text">Books</span>
+                 <span class="submenu-arrow">
+                     <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+</svg>
+                 </span><!--//submenu-arrow-->
+            </a><!--//nav-link-->
+            <div id="submenu-1" class="collapse submenu submenu-1" data-bs-parent="#menu-accordion">
+                <ul class="submenu-list list-unstyled" id='bookdropdown'>
+                  
+                    <li class="submenu-item"><a class="submenu-link" href="{% url 'book_list' %}">Book List</a></li>
+                    {% if request.user.role == 'admin' %}
+                    <li class="submenu-item"><a class="submenu-link" href="{% url 'approve_book_list' %}">Book Approve</a></li>
+                    {% endif %}
+                    <li class="submenu-item"><a class="submenu-link " href="{% url 'upload_book' %}">Books Upload</a></li>
+                    {% comment %} <li class="submenu-item"><a class="submenu-link" href="{% url 'update_book' %}">Books Update</a></li> {% endcomment %}
+                    <li class="submenu-item"><a class="submenu-link " href="{% url 'category_combined' %}">Books Category</a></li>
+
+                </ul>
+            </div>
+        </li><!--//nav-item-->
+        <li class="nav-item">
+            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+            <a class="nav-link" href="{% url 'pincode_manage' %}">
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" fill="currentColor" class="bi bi-lock" viewBox="0 0 16 16">
+                        <path d="M11 7V4a4 4 0 0 0-8 0v3H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-1zm-1 0H6V4a3 3 0 1 1 6 0v3z"/>
+                    </svg>
+                 </span>
+                 <span class="nav-link-text">Pincode</span>
+            </a><!--//nav-link-->
+        </li><!--//nav-item-->
+        <li class="nav-item">
+            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+            <a class="nav-link" href="{% url 'author' %}">
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16">
+  <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
+</svg>
+                 </span>
+                 <span class="nav-link-text">Author</span>
+            </a><!--//nav-link-->
+        </li><!--//nav-item-->
+        <li class="nav-item">
+            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+            <a class="nav-link" href="{% url 'create_categories' %}">
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" fill="currentColor" class="bi bi-folder" viewBox="0 0 16 16" style="margin-right: 5px;">
+                        <path d="M9.828 3a.5.5 0 0 1 .354.146l1.172 1.172A.5.5 0 0 0 11.828 4H14a1 1 0 0 1 1 1v1H1V4a1 1 0 0 1 1-1h7.828z"/>
+                        <path d="M15 6v6a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6h14z"/>
+                      </svg>
+                 </span>
+                 <span class="nav-link-text">Manage Category</span>
+            </a><!--//nav-link-->
+        </li><!--//nav-item-->
+        {% if request.user.role == 'admin' %}
+        <li class="nav-item">
+            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+            <a class="nav-link" href="{% url 'coupon_list' %}">
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-ticket-perforated-fill" viewBox="0 0 16 16">
+                        <path d="M0 4.5A1.5 1.5 0 0 1 1.5 3h13A1.5 1.5 0 0 1 16 4.5V6a.5.5 0 0 1-.5.5 1.5 1.5 0 0 0 0 3 .5.5 0 0 1 .5.5v1.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 11.5V10a.5.5 0 0 1 .5-.5 1.5 1.5 0 1 0 0-3A.5.5 0 0 1 0 6zm4-1v1h1v-1zm1 3v-1H4v1zm7 0v-1h-1v1zm-1-2h1v-1h-1zm-6 3H4v1h1zm7 1v-1h-1v1zm-7 1H4v1h1zm7 1v-1h-1v1zm-8 1v1h1v-1zm7 1h1v-1h-1z"/>
+                      </svg>
+                 </span>
+                 <span class="nav-link-text">Coupon</span>
+            </a><!--//nav-link-->
+        </li><!--//nav-item-->
+         <li class="nav-item">
+            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+            <a class="nav-link" href="{% url 'Publication' %}">
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-journal-text" viewBox="0 0 16 16">
+                        <path d="M5 10.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
+                        <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2"/>
+                        <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1z"/>
+                        </svg>
+                 </span>
+                 <span class="nav-link-text">Publication</span>
+            </a><!--//nav-link-->
+        </li><!--//nav-item-->
+        <li class="nav-item">
+            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+            <a class="nav-link active" href="{% url 'book_order_list' %}">
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart-fill me-2" viewBox="0 0 16 16">
+                        <path d="M0 1.5A.5.5 0 0 1 .5 1h1a.5.5 0 0 1 .485.379L2.89 5H14.5a.5.5 0 0 1 .49.598l-1.5 7A.5.5 0 0 1 13 13H4a.5.5 0 0 1-.49-.402L1.61 2H.5a.5.5 0 0 1-.5-.5zM5 14a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm7 1a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                      </svg>
+                 </span>
+                 <span class="nav-link-text">Orders</span>
+            </a><!--//nav-link-->
+        </li><!--//nav-item-->
+        <li class="nav-item">
+                <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+                <a class="nav-link" href="{% url 'pending_orders' %}">
+                    <span class="nav-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-check-fill" viewBox="0 0 16 16">
+                        <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0m7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-1.646-7.646-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L8 8.293l2.646-2.647a.5.5 0 0 1 .708.708"/>
+                        </svg>
+                    </span>
+                    <span class="nav-link-text">Orders Manage</span>
+                </a><!--//nav-link-->
+            </li><!--//nav-item-->
+        <li class="nav-item">
+            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+            <a class="nav-link" href="{% url 'order_report' %}">
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-box-seam" viewBox="0 0 16 16">
+                        <path d="M8.476.326a.5.5 0 0 0-.452 0l-6 3a.5.5 0 0 0-.271.447v9.554a.5.5 0 0 0 .276.445l6 2.857a.5.5 0 0 0 .442 0l6-2.857a.5.5 0 0 0 .276-.445V3.773a.5.5 0 0 0-.271-.447l-6-3zM8 1.122 13.5 4 8 6.878 2.5 4 8 1.122z"/>
+                        <path d="M8 7.122V14.5l-5-2.381V4.879l5 2.243z"/>
+                        <path d="M8 14.5v-7.378l5-2.243v7.24l-5 2.381z"/>
+                      </svg>
+                 </span>
+                 <span class="nav-link-text">Order Reports</span>
+            </a><!--//nav-link-->
+        </li><!--//nav-item-->
+        <li class="nav-item">
+            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+            <a class="nav-link" href="{% url 'rating' %}">
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
+                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                      </svg>
+                 </span>
+                 <span class="nav-link-text">Ratings</span>
+            </a><!--//nav-link-->
+        </li><!--//nav-item-->
+        {% endif %}
+        
+        
+        				    
+    </ul><!--//app-menu-->
+</nav><!--//app-nav-->
+
+
+</div><!--//sidepanel-inner-->
+</div><!--//app-sidepanel-->
+</header><!--//app-header-->
+
+
+    
+    
+<div class="app-wrapper">
+   <div class="container mt-5">
+    {% if order %}
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title mb-4">Order Details - <span class="text-muted">{{ order.order_id }}</span></h2>
+
+                <ul class="list-group list-group-flush mb-4">
+                    <li class="list-group-item"><strong>Order Date:</strong> {{ order.order_date }}</li>
+                    <li class="list-group-item"><strong>Customer:</strong> {{ order.user.first_name }} {{ order.user.last_name }}</li>
+                    <li class="list-group-item"><strong>Payment Method:</strong> {{ order.get_payment_method_display }}</li>
+                    <li class="list-group-item"><strong>Status:</strong> {{ order.get_status_display }}</li>
+                    <li class="list-group-item"><strong>Coupon Code:</strong> {{ order.coupon_code|default:"N/A" }}</li>
+                    <li class="list-group-item"><strong>Coupon Amount:</strong> ₹{{ order.coupon_amount|default:"0.00" }}</li>
+                    <li class="list-group-item"><strong>Total Price:</strong> ₹{{ order.total_price }}</li>
+                </ul>
+
+                <h4 class="mt-4">Books Ordered</h4>
+                {% if order.books.all %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered mt-3">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Book Title</th>
+                                    <th>Author</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for book in order.books.all %}
+                                    <tr>
+                                        <td>{{ book.title }}</td>
+                                        <td>{{ book.author }}</td>
+                                        <td>₹{{ book.price }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No books found for this order.</p>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-warning mt-4">
+            <strong>Order not found.</strong> Please check your URL or return to the orders list.
+        </div>
+    {% endif %}
+
+    <a href="{% url 'book_order_list' %}" class="btn btn-secondary mt-4">← Back to Orders List</a>
+</div>
+
+</div>
+{% endblock %}

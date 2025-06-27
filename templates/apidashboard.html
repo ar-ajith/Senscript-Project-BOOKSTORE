@@ -1,0 +1,106 @@
+    <head>
+  <style>
+    body {
+      background-image: url('https://images.pexels.com/photos/707582/pexels-photo-707582.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2 ');
+      background-size: cover;
+      background-repeat: no-repeat;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      justify-content: center;
+      color: black;
+    }
+
+    #welcome-msg {
+      font-size: 4rem;
+      margin-bottom: 15px;
+    }
+
+    #user-info {
+      margin-bottom: 30px;
+      font-size: 2rem;
+      color: black;
+    }
+
+    button {
+      background-color: white;
+      border: none;
+      padding: 10px 20px;
+      color: black;
+      font-size: 2rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color:rgb(4, 151, 75);
+    }
+  </style>
+</head>
+<body>
+
+    <div id="welcome-msg"></div>
+    <div id="user-info"></div>
+    <button onclick="logout()">Logout</button>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    const access = localStorage.getItem("access_token");
+    const refresh = localStorage.getItem("refresh_token");
+
+    if (!access) {
+        window.location.href = "/api/login/";
+        return;
+    }
+
+    $.ajax({
+        url: "http://127.0.0.1:8000/api/decode/",
+        method: "GET",
+        headers: {
+            "Authorization": "Bearer " + access,
+            "Content-Type": "application/json"
+        },
+        success: function(data) {
+            const role = data.role || "Unknown";
+            const email = data.email || "User";
+            const first_name=data.first_name || "User";
+            $("#welcome-msg").text(`👋 Welcome ${first_name} `);
+            $("#user-info").html(`
+            <div><strong>Role:</strong>${role}</div>
+            <div><strong>Name:</strong>${first_name}</div>
+            <div><strong>Email:</strong>${email}</div>`);
+        },
+        error: function(err) {
+            console.error("Token error:", err);
+            localStorage.clear();
+            window.location.href = "/api/login/";
+        }
+    });
+});
+</script>
+<script>
+function logout() {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+
+    fetch("/api/logout/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "include",  
+    }).then(() => {
+        window.location.href = "/api/login/";
+    });
+}
+</script>
+
+
+</body>
+

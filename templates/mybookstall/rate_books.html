@@ -1,0 +1,332 @@
+{% extends "mybookstall/base.html" %}
+{% load static %}
+{% block content %}
+
+
+<style>
+    #shop{
+        padding-bottom:10%;
+    }
+  .product-div{
+    padding-top:3%;
+    padding-bottom:20%;
+  }
+  .product-card {
+    background-color: #fff;
+    padding: 15px 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-thumbnail {
+    height: 250px;
+    object-fit: cover;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.product-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 10px 0 5px;
+    min-height: 2.5em; /* Keep title area aligned */
+}
+
+.product-price {
+    font-size: 1rem;
+    margin: 10px 0;
+}
+
+.rating-stars i {
+    font-size: 0.85rem;
+}
+
+.icon-cross img {
+    width: 24px;
+    height: 24px;
+}
+
+    #text{
+                font-size:40px;
+                font-family: "Fontdiner Swanky", serif;
+                font-weight: 400;
+                font-style: normal;
+                color:white;
+            }
+                #text1{
+                font-size:40px;
+                font-family: "Fontdiner Swanky", serif;
+                font-weight: 400;
+                font-style: normal;
+                color:black;
+            }
+    .container a{
+      text-decoration:none;
+    }     
+        
+.wishlist-icon {
+  color: grey;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  font-size: 24px;
+}
+
+.wishlist-icon.active {
+  color: red;
+}
+
+
+/* style rate page */
+.rating-card:hover {
+  background-color: #f9f9f9;
+}
+
+.star-rating img {
+  transition: transform 0.2s ease;
+}
+
+.star-rating img:hover {
+  transform: scale(1.2);
+}
+
+.step-indicator-wrapper {
+  max-width: 600px;
+  margin: 40px auto 20px;
+}
+
+.step-indicator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+  z-index: 1;
+}
+
+.step-icon {
+  width: 40px;
+  height: 40px;
+  background: #ccc;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 8px;
+  transition: 0.3s ease;
+}
+
+.step-text {
+  font-size: 14px;
+  color: #555;
+}
+
+.step.active .step-icon {
+  background: linear-gradient(145deg, #3b5d50, #5d7d6e);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.step.active .step-text {
+  font-weight: 600;
+  color: #3b5d50;
+}
+
+.progress-line {
+  height: 4px;
+  background-color: #ccc;
+  flex: 1;
+  margin: 0 4px;
+  position: relative;
+  top: -20px;
+  z-index: 0;
+}
+
+.step.active + .progress-line {
+  background: linear-gradient(to right, #3b5d50, #5d7d6e);
+}
+</style>
+
+        <nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
+
+			<div class="container">
+				<a class="app-logo" href="{% url 'user_dashboard' %}"><img class="logo-icon me-2" src="{% static 'img/logo.png' %}" alt="logo">
+                        <span class="logo-text" id='text'>Book Store</span>
+                    </a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+
+				<div class="collapse navbar-collapse" id="navbarsFurni">
+					<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+						<li>
+							<a class="nav-link" href="{% url 'user_dashboard' %}">Home</a>
+						</li>
+						<li class="nav-item"><a class="nav-link" href="{% url 'shop' %}">Shop</a></li>
+						<li><a class="nav-link" href="{% url 'about' %}">About us</a></li>
+						<li><a class="nav-link" href="{% url 'services' %}">Services</a></li>
+						<li><a class="nav-link" href="{% url 'blog' %}">Blog</a></li>
+						<li><a class="nav-link" href="{% url 'contact' %}">Contact us</a></li>
+					</ul>
+
+<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+  <!-- Cart icon -->
+<li>
+    <a class="nav-link" href="{% url 'cartview' %}">
+      <img src="{% static 'mybookstall/img/cart.svg' %}" alt="Cart">
+      <span id="cart-count" class="badge bg-danger">
+        {% if request.user.is_authenticated %}
+    {{ request.user.cart.items.count }}
+{% else %}
+    0
+{% endif %}
+
+      </span>
+    </a>
+</li>
+<li class="nav-item position-relative">
+  <a class="nav-link {% if request.resolver_match.url_name == 'wishlist_view' %}active{% endif %}" 
+     href="{% url 'wishlist_view' %}">
+    <img src="{% static 'mybookstall/img/heart.png' %}" alt="Wishlist" style="width: 32px; margin-right: 20px;">
+    <span id="wishlist-count" class="badge bg-warning">
+      {% if request.user.is_authenticated %}
+        {{ request.user.wishlist.count }}
+      {% else %}
+        0
+      {% endif %}
+    </span>
+  </a>
+</li>
+
+  {% if user.is_authenticated %}
+  <!-- User dropdown when logged in -->
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <img src="{% static 'mybookstall/img/user.svg' %}" alt="User">
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+      <li><a class="dropdown-item" href="{% url 'user_profile' %}">Profile</a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-danger" href="{% url 'user_logout' %}">Logout</a></li>
+    </ul>
+  </li>
+  {% else %}
+  <!-- Show Login link if not logged in -->
+ <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <img src="{% static 'mybookstall/img/user.svg' %}" alt="User">
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-danger" href="{% url 'user_login' %}">Login</a></li>
+    </ul>
+  </li>
+  {% endif %}
+</ul>
+
+				</div>
+			</div>
+		</nav>
+
+<div class="step-indicator-wrapper">
+  <div class="step-indicator">
+    <div class="step active">
+      <div class="step-icon">1</div>
+      <div class="step-text">Shipping</div>
+    </div>
+    <div class="progress-line"></div>
+    <div class="step active">
+      <div class="step-icon">2</div>
+      <div class="step-text">Payment</div>
+    </div>
+    <div class="progress-line"></div>
+    <div class="step active">
+      <div class="step-icon">3</div>
+      <div class="step-text">Confirmation/Rating</div>
+    </div>
+  </div>
+</div>
+
+<div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; ">
+  <div style="width: 100%; max-width: 750px; background: white; padding: 40px 30px; border-radius: 12px; box-shadow: 0 6px 24px rgba(0,0,0,0.1); margin-bottom:20%;">
+
+    <h2 style="margin-bottom: 40px; text-align: center; color: #2c3e50; font-size: 28px; font-weight: 600;">
+      Rate Your Purchased Books
+    </h2>
+
+    <form method="post" action="{% url 'submit_order_ratings' order.id %}">
+      {% csrf_token %}
+
+      {% for book in books %}
+        <div class="rating-card" style="margin-bottom: 35px; text-align: center;">
+          <h4 style="font-size: 24px; font-weight: 500; margin-bottom: 15px; color: #34495e;">
+            {{ book.title }}
+          </h4>
+
+          <div class="star-rating" data-book-id="{{ book.id }}" style="display: inline-flex; gap: 10px;">
+            {% for i in "12345" %}
+              <span class="star"
+                    data-value="{{ i }}"
+                    data-book="{{ book.id }}"
+                    style="font-size: 36px; cursor: pointer; color: lightgray; transition: color 0.3s;">&#9733;</span>
+            {% endfor %}
+            <input type="hidden" name="rating_{{ book.id }}" id="rating-input-{{ book.id }}">
+          </div>
+        </div>
+      {% endfor %}
+
+      <div style="text-align: center; margin-top: 20px;">
+        <button type="submit" style="padding: 14px 36px; background: #3b5d50; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: 500;">
+          Submit Ratings
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const stars = document.querySelectorAll(".star");
+
+  stars.forEach(star => {
+    star.addEventListener("click", function () {
+      const selectedValue = this.getAttribute("data-value");
+      const bookId = this.getAttribute("data-book");
+
+      // Update hidden input
+      document.getElementById(`rating-input-${bookId}`).value = selectedValue;
+
+      // Reset all stars for this book
+      const bookStars = document.querySelectorAll(`.star[data-book="${bookId}"]`);
+      bookStars.forEach(s => {
+        s.style.color = "lightgray";
+      });
+
+      // Highlight selected stars
+      for (let i = 0; i < selectedValue; i++) {
+        bookStars[i].style.color = "gold";
+      }
+    });
+  });
+});
+</script>
+
+
+{% endblock %}

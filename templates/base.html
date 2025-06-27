@@ -1,0 +1,243 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <title>Book Store</title>
+    
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="description" content="Portal - Bootstrap 5 Admin Dashboard Template For Developers">
+    <meta name="author" content="Xiaoying Riley at 3rd Wave Media">    
+    <link rel="shortcut icon" href="favicon.ico"> 
+    
+    <!-- FontAwesome JS-->
+    
+    <link rel="icon" type="image/png"  href="{% static 'img/logo.png' %}">
+    <!-- App CSS -->  
+    <link id="theme-style" rel="stylesheet" href="{% static 'css/portal.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bimg.css' %}">
+
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Almendra:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Fontdiner+Swanky&display=swap" rel="stylesheet"><style>
+</style>
+    
+
+</head> 
+
+<body class="app">   	
+    <header class="app-header fixed-top">	   	            
+        <div class="app-header-inner">  
+	        <div class="container-fluid py-2">
+		        <div class="app-header-content"> 
+		            <div class="row justify-content-between align-items-center">
+			        
+				    <div class="col-auto">
+					    <a id="sidepanel-toggler" class="sidepanel-toggler d-inline-block d-xl-none" href="#">
+						    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" role="img"><title>Menu</title><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg>
+					    </a>
+				    </div><!--//col-->
+
+		            
+		            <div class="app-utilities col-auto">
+			            <div class="app-utility-item app-user-dropdown dropdown"> 
+                             
+				            <a class="dropdown-toggle" id="user-dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false"> {% if request.user.userprofile.profile_image %}
+                                <img src="{{ request.user.userprofile.profile_image.url }}" alt="Profile Image" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+                            {% else %}
+                                <img src="{% static 'img/person_icon.png' %}" alt="Default Profile" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+                            {% endif %}</a>
+				            <ul class="dropdown-menu" aria-labelledby="user-dropdown-toggle">
+								<li><a class="dropdown-item" href="{% url 'logout' %}">Log Out</a></li><li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
+							</ul>
+			            </div><!--//app-user-dropdown--> 
+		            </div><!--//app-utilities-->
+		        </div><!--//row-->
+	            </div><!--//app-header-content-->
+	        </div><!--//container-fluid-->
+        </div><!--//app-header-inner-->
+        <div id="app-sidepanel" class="app-sidepanel"> 
+	        <div id="sidepanel-drop" class="sidepanel-drop"></div>
+	        <div class="sidepanel-inner d-flex flex-column">
+		        <a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">&times;</a>
+		        <div class="app-branding">
+		            <a class="app-logo" href="{% url 'admindashboard' %}"><img class="logo-icon me-2" src="{% static 'img/logo.png' %}" alt="logo">
+                        <span class="logo-text" id='text' style="background: linear-gradient(to right,rgb(10, 179, 97),rgb(3, 113, 58));
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;">Book Store</span>
+                    </a>
+	
+		        </div><!--//app-branding--> 
+                <!-- Toast Container -->
+                <div class="position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+                    {% if messages %}
+                        {% for message in messages %}
+                            {% if message.tags == "success" %}
+                                <div class="toast show shadow-lg rounded-3 border-0 animate__animated animate__fadeInUp"
+                                     role="alert" aria-live="assertive" aria-atomic="true"
+                                     style="min-width: 300px; background: linear-gradient(135deg, #15a362 0%, #128456 100%); color: #fff;">
+                            {% elif message.tags == "error" or message.tags == "danger" %}
+                                <div class="toast show shadow-lg rounded-3 border-0 animate__animated animate__fadeInUp"
+                                     role="alert" aria-live="assertive" aria-atomic="true"
+                                     style="min-width: 300px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: #fff;">
+                            {% else %}
+                                <div class="toast show shadow-lg rounded-3 border-0 animate__animated animate__fadeInUp"
+                                     role="alert" aria-live="assertive" aria-atomic="true"
+                                     style="min-width: 300px; background: #444; color: #fff;">
+                            {% endif %}
+                                <div class="d-flex">
+                                    <div class="toast-body">
+                                        {{ message }}
+                                    </div>
+                                    <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                                            data-bs-dismiss="toast" aria-label="Close"></button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                
+                <div id="loader" class="loader-overlay" style="display: none;">
+                    <div class="spinner"></div>
+                </div>
+ 
+		        
+			    
+            {% block content %}
+
+
+
+            {% endblock %}
+            
+        </div><!--//app-wrapper-->    					
+    
+    <script defer src="{% static 'js/all.min.js' %}"></script>
+     
+        <!-- Javascript -->          
+        <script src="{% static 'js/popper.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap.min.js' %}"></script>  
+    
+        <!-- Charts JS -->
+        <script src="{% static 'js/chart.min.js' %}"></script> 
+        <script src="{% static 'js/index-charts.js' %}"></script> 
+        
+
+        
+        <!-- Page Specific JS -->
+        <script src="{% static 'js/app.js' %}"></script> 
+        <style>
+            #text{
+                font-size:26px;
+                font-family: "Fontdiner Swanky", serif;
+                font-weight: 400;
+                font-style: normal;
+            }
+            body {
+                    font-family: "Libre Baskerville", serif;
+                    font-weight: 700;
+                    font-style: normal;
+                 }
+            nav{
+                 font-size:17px;
+            }
+                 #bookdropdown li a:hover{
+                    color:#15a362;
+                 }
+                 
+    
+                .loader-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(255, 255, 255, 0.7);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 9999;
+                }
+                
+                .spinner {
+                    width: 45px;
+                    height: 45px;
+                    border: 4px solid #ccc;
+                    border-top-color: #15a362;
+                    border-radius: 100%;
+                    animation: spin 0.6s linear infinite;
+                }
+                
+                @keyframes spin {
+                    to {
+                        transform: rotate(360deg);
+                    }
+                }
+                 
+            
+        </style>
+        {% block scripts %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const loader = document.getElementById('loader');
+                const body = document.body;
+            
+                // Show loader for link clicks
+                document.querySelectorAll('a').forEach(function (link) {
+                    link.addEventListener('click', function (e) {
+                        const href = link.getAttribute('href');
+                        if (!href || href.startsWith('#') || link.classList.contains('no-loader')) return;
+            
+                        e.preventDefault();
+                        loader.style.display = 'flex';
+                        setTimeout(() => {
+                            window.location.href = href;
+                        }, 300);
+                    });
+                });
+            
+                // Show loader for form submits
+                document.querySelectorAll('form').forEach(function (form) {
+                    form.addEventListener('submit', function () {
+                        loader.style.display = 'flex';
+                    });
+                });
+            
+                // Loader and fade-in on normal load
+                window.addEventListener('load', function () {
+                    loader.style.display = 'none';
+                    body.classList.add('loaded');
+                });
+            
+                // Handle browser forward/back navigation
+                window.addEventListener('pageshow', function (event) {
+                    const navType = performance.getEntriesByType("navigation")[0].type;
+            
+                    if (event.persisted || navType === "back_forward") {
+                        // Don't show loader on cached pages (back/forward restored instantly)
+                        loader.style.display = 'none';
+                        body.classList.add('loaded');
+                    } else {
+                        // Page was not restored from cache — show loader for forward button
+                        loader.style.display = 'flex';
+                        setTimeout(() => {
+                            loader.style.display = 'none';
+                            body.classList.add('loaded');
+                        }, 400); // spinner visible for a short time
+                    }
+                });
+            });
+            </script>
+            {% endblock %}
+            
+        
+    
+    </body>
+    </html> 
+    
+    

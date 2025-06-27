@@ -1,0 +1,322 @@
+{% extends "mybookstall/base.html" %}
+{% load static %}
+{% block content %}
+
+
+<style>
+    #shop{
+        padding-bottom:10%;
+    }
+  .product-div{
+    padding-top:3%;
+    padding-bottom:20%;
+  }
+  .product-card {
+    background-color: #fff;
+    padding: 15px 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-thumbnail {
+    height: 250px;
+    object-fit: cover;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.product-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 10px 0 5px;
+    min-height: 2.5em; /* Keep title area aligned */
+}
+
+.product-price {
+    font-size: 1rem;
+    margin: 10px 0;
+}
+
+.rating-stars i {
+    font-size: 0.85rem;
+}
+
+.icon-cross img {
+    width: 24px;
+    height: 24px;
+}
+
+    #text{
+                font-size:40px;
+                font-family: "Fontdiner Swanky", serif;
+                font-weight: 400;
+                font-style: normal;
+                color:white;
+            }
+                #text1{
+                font-size:40px;
+                font-family: "Fontdiner Swanky", serif;
+                font-weight: 400;
+                font-style: normal;
+                color:black;
+            }
+    .container a{
+      text-decoration:none;
+    }     
+        
+.wishlist-icon {
+  color: grey;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  font-size: 24px;
+}
+
+.wishlist-icon.active {
+  color: red;
+}
+
+
+</style>
+
+        <nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
+
+			<div class="container">
+				<a class="app-logo" href="{% url 'user_dashboard' %}"><img class="logo-icon me-2" src="{% static 'img/logo.png' %}" alt="logo">
+                        <span class="logo-text" id='text'>Book Store</span>
+                    </a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+
+				<div class="collapse navbar-collapse" id="navbarsFurni">
+					<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+						<li>
+							<a class="nav-link" href="{% url 'user_dashboard' %}">Home</a>
+						</li>
+						<li class="nav-item "><a class="nav-link" href="{% url 'shop' %}">Shop</a></li>
+						<li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About us</a></li>
+						<li class="nav-item active"><a class="nav-link" href="{% url 'services' %}">Services</a></li>
+						<li><a class="nav-link" href="{% url 'blog' %}">Blog</a></li>
+						<li><a class="nav-link" href="{% url 'contact' %}">Contact us</a></li>
+					</ul>
+
+<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+  <!-- Cart icon -->
+<li>
+    <a class="nav-link" href="{% url 'cartview' %}">
+      <img src="{% static 'mybookstall/img/cart.svg' %}" alt="Cart">
+      <span id="cart-count" class="badge bg-danger">
+        {% if request.user.is_authenticated %}
+    {{ request.user.cart.items.count }}
+{% else %}
+    0
+{% endif %}
+
+      </span>
+    </a>
+</li>
+<li class="nav-item position-relative">
+  <a class="nav-link {% if request.resolver_match.url_name == 'wishlist_view' %}active{% endif %}" 
+     href="{% url 'wishlist_view' %}">
+    <img src="{% static 'mybookstall/img/heart.png' %}" alt="Wishlist" style="width: 32px; margin-right: 20px;">
+    <span id="wishlist-count" class="badge bg-warning">
+      {% if request.user.is_authenticated %}
+        {{ request.user.wishlist.count }}
+      {% else %}
+        0
+      {% endif %}
+    </span>
+  </a>
+</li>
+
+  {% if user.is_authenticated %}
+  <!-- User dropdown when logged in -->
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <img src="{% static 'mybookstall/img/user.svg' %}" alt="User">
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+      <li><a class="dropdown-item" href="{% url 'user_profile' %}">Profile</a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-danger" href="{% url 'user_logout' %}">Logout</a></li>
+    </ul>
+  </li>
+  {% else %}
+  <!-- Show Login link if not logged in -->
+ <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <img src="{% static 'mybookstall/img/user.svg' %}" alt="User">
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-danger" href="{% url 'user_login' %}">Login</a></li>
+    </ul>
+  </li>
+  {% endif %}
+</ul>
+
+				</div>
+			</div>
+		</nav>
+
+
+<div class="services-container" id="shop">
+    <h1>Our Services</h1>
+
+    <div class="service-grid">
+      <div class="service-card" data-aos="fade-up">
+        <img src="{% static 'mybookstall/img/delivery.jpg' %}" alt="Fast Delivery">
+        <div class="service-title">Fast Book Delivery</div>
+        <div class="service-description">We deliver your favorite books swiftly and securely across India.</div>
+      </div>
+
+      <div class="service-card" data-aos="fade-up" data-aos-delay="100">
+        <img src="{% static 'mybookstall/img/recommendation.jpg' %}" alt="Smart Recommendations">
+        <div class="service-title">Smart Recommendations</div>
+        <div class="service-description">Get personalized book suggestions tailored to your taste and reading habits.</div>
+      </div>
+
+      <div class="service-card" data-aos="fade-up" data-aos-delay="200">
+        <img src="{% static 'mybookstall/img/seller.jpg' %}" alt="Seller Portal">
+        <div class="service-title">Seller Portal</div>
+        <div class="service-description">Authors and stores can easily manage listings and reach thousands of readers.</div>
+      </div>
+
+      <div class="service-card" data-aos="fade-up" data-aos-delay="300">
+        <img src="{% static 'mybookstall/img/support.jpg' %}" alt="24/7 Support">
+        <div class="service-title">24/7 Support</div>
+        <div class="service-description">Need help? Our team is here day and night to assist you with any issue.</div>
+      </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="cta" data-aos="zoom-in" data-aos-delay="400">
+      <h2>Join the Bookstall Community</h2>
+      <p>Explore, buy, and sell books with ease and joy. We're here to help you grow your love of reading.</p>
+      <a href="{% url 'user_dashboard' %}">Get Started</a>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script>
+    AOS.init({
+      duration: 800,
+      once: true
+    });
+  </script>
+
+
+
+
+
+<style>
+    
+    .services-container {
+      max-width: 1200px;
+      margin: 80px auto;
+      padding: 0 30px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 42px;
+      background: linear-gradient(to right,rgb(0, 0, 0),rgb(0, 0, 0));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 40px;
+    }
+
+    .service-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 30px;
+    }
+
+    .service-card {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .service-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .service-card img {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      object-fit: cover;
+    }
+
+    .service-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #212121;
+      margin-bottom: 10px;
+    }
+
+    .service-description {
+      font-size: 15px;
+      color: #444;
+    }
+
+    /* Call to Action */
+    .cta {
+      margin-top: 80px;
+      background: linear-gradient(135deg, #3b5d50, #3b5d50);
+      color: white;
+      padding: 50px 30px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+
+    .cta h2 {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
+    .cta p {
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    .cta a {
+      display: inline-block;
+      padding: 12px 28px;
+      background: white;
+      color: #3f51b5;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+
+    .cta a:hover {
+      background: #e0e0e0;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 32px;
+      }
+    }
+  </style>
+{% endblock %}

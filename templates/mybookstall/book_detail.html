@@ -1,0 +1,432 @@
+{% extends "mybookstall/base.html" %}
+{% load static %}
+{% block content %}
+
+
+
+<style>
+    #shop{
+        padding-bottom:10%;
+    }
+  .product-div{
+    padding-top:3%;
+    padding-bottom:20%;
+  }
+  .product-card {
+    background-color: #fff;
+    padding: 15px 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-thumbnail {
+    height: 250px;
+    object-fit: cover;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.product-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 10px 0 5px;
+    min-height: 2.5em; /* Keep title area aligned */
+}
+
+.product-price {
+    font-size: 1rem;
+    margin: 10px 0;
+}
+
+.rating-stars i {
+    font-size: 0.85rem;
+}
+
+.icon-cross img {
+    width: 24px;
+    height: 24px;
+}
+
+    #text{
+                font-size:40px;
+                font-family: "Fontdiner Swanky", serif;
+                font-weight: 400;
+                font-style: normal;
+                color:white;
+            }
+                #text1{
+                font-size:40px;
+                font-family: "Fontdiner Swanky", serif;
+                font-weight: 400;
+                font-style: normal;
+                color:black;
+            }
+    .container a{
+      text-decoration:none;
+    }     
+        
+.wishlist-icon {
+  color: grey;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  font-size: 24px;
+}
+
+.wishlist-icon.active {
+  color: red;
+}
+
+        
+    /* book_detail style */
+.book-image {
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    border-radius: 12px;
+}
+
+.author-image {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border: 3px solid #3498db; /* bright blue border */
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.publication-logo {
+    height: 35px;
+    vertical-align: middle;
+}
+
+h2 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h5 {
+    margin: 0;
+    font-weight: 600;
+    color: #34495e;
+}
+
+p {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: #555;
+}
+
+.description-short {
+    max-height: 5rem;
+    overflow: hidden;
+    position: relative;
+}
+
+.description-short a, .description-full a {
+    color: #2980b9;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.description-short a:hover, .description-full a:hover {
+    text-decoration: underline;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    border: none;
+    padding: 0.7rem 1.5rem;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(41, 128, 185, 0.5);
+    transition: background 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+}
+
+
+
+ul {
+    padding-left: 20px;
+    margin-top: 0.5rem;
+    color: #444;
+}
+
+ul li {
+    margin-bottom: 0.3rem;
+}
+
+.author-publication {
+    border-top: 2px solid #ecf0f1;
+    padding-top: 1rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+@media (max-width: 768px) {
+    .author-publication {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}
+
+
+
+</style>
+
+        <nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
+
+			<div class="container">
+				<a class="app-logo" href="{% url 'user_dashboard' %}"><img class="logo-icon me-2" src="{% static 'img/logo.png' %}" alt="logo">
+                        <span class="logo-text" id='text'>Book Store</span>
+                    </a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+
+				<div class="collapse navbar-collapse" id="navbarsFurni">
+					<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+						<li>
+							<a class="nav-link" href="{% url 'user_dashboard' %}">Home</a>
+						</li>
+						<li class="nav-item active"><a class="nav-link" href="{% url 'shop' %}">Shop</a></li>
+						<li><a class="nav-link" href="{% url 'about' %}">About us</a></li>
+						<li><a class="nav-link" href="{% url 'services' %}">Services</a></li>
+						<li><a class="nav-link" href="{% url 'blog' %}">Blog</a></li>
+						<li><a class="nav-link" href="{% url 'contact' %}">Contact us</a></li>
+					</ul>
+
+<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+  <!-- Cart icon -->
+<li>
+    <a class="nav-link" href="{% url 'cartview' %}">
+      <img src="{% static 'mybookstall/img/cart.svg' %}" alt="Cart">
+      <span id="cart-count" class="badge bg-danger">
+        {% if request.user.is_authenticated %}
+    {{ request.user.cart.items.count }}
+{% else %}
+    0
+{% endif %}
+
+      </span>
+    </a>
+</li>
+<li class="nav-item position-relative">
+  <a class="nav-link {% if request.resolver_match.url_name == 'wishlist_view' %}active{% endif %}" 
+     href="{% url 'wishlist_view' %}">
+    <img src="{% static 'mybookstall/img/heart.png' %}" alt="Wishlist" style="width: 32px; margin-right: 20px;">
+    <span id="wishlist-count" class="badge bg-warning">
+      {% if request.user.is_authenticated %}
+        {{ request.user.wishlist.count }}
+      {% else %}
+        0
+      {% endif %}
+    </span>
+  </a>
+</li>
+
+  {% if user.is_authenticated %}
+  <!-- User dropdown when logged in -->
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <img src="{% static 'mybookstall/img/user.svg' %}" alt="User">
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+      <li><a class="dropdown-item" href="{% url 'user_profile' %}">Profile</a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-danger" href="{% url 'user_logout' %}">Logout</a></li>
+    </ul>
+  </li>
+  {% else %}
+  <!-- Show Login link if not logged in -->
+ <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <img src="{% static 'mybookstall/img/user.svg' %}" alt="User">
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-danger" href="{% url 'user_login' %}">Login</a></li>
+    </ul>
+  </li>
+  {% endif %}
+</ul>
+
+				</div>
+			</div>
+		</nav>
+
+<div class="container py-5" >
+    <div class="row" id="shop">
+
+        <!-- Book Image and Add to Cart -->
+        <div class="col-md-4 text-center">
+            {% if book.image %}
+                <img src="{{ book.image.url }}" alt="{{ book.title }}" class="book-image rounded mb-3" />
+            {% else %}
+                <img src="{% static 'img/default-book.png' %}" alt="No image" class="book-image rounded mb-3" />
+            {% endif %}
+        </div>
+
+        <!-- Book Details -->
+        <div class="col-md-8">
+            <h2>{{ book.title }}</h2>
+
+            <!-- Book Description with Read More -->
+            {% if book.description %}
+                <p id="book-description" class="description-short">
+                    {{ book.description|truncatechars:300 }}
+                    {% if book.description|length > 300 %}
+                        ... <a href="javascript:void(0)" id="read-more-btn"data-disable-transition="true" class="no-loader">Read More</a>
+                    {% endif %}
+                </p>
+                <p id="book-description-full" class="description-full" style="display:none;">
+                    {{ book.description }} <a href="javascript:void(0)" id="read-less-btn"data-disable-transition="true"class="no-loader">Read Less</a>
+                </p>
+            {% else %}
+                <p><em>No description available.</em></p>
+            {% endif %}
+
+            <!-- Categories -->
+            <p><strong>Main Category:</strong>
+                {% if book.main_category %}
+                    {{ book.main_category.name }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </p>
+            <p><strong>Genre:</strong>
+                {% if book.genre %}
+                    {{ book.genre.name }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </p>
+            <p><strong>Language:</strong>
+                {% if book.language %}
+                    {{ book.language.name }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </p>
+            <p><strong>Binding:</strong>
+                {% if book.binding %}
+                    {{ book.binding.name }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </p>
+
+            <!-- Pricing -->
+            <p><strong>Price:</strong>
+                {% if book.discounted_price and book.discounted_price < book.price %}
+                    <del>${{ book.price }}</del> <strong class="text-success">${{ book.discounted_price }}</strong>
+                    <span class="badge bg-danger">-{{ book.discount_percent }}%</span>
+                {% else %}
+                    ${{ book.price }}
+                {% endif %}
+            </p>
+
+            <!-- Available Pincodes -->
+            <p><strong>Available Pincodes:</strong></p>
+            <ul>
+                {% for pincode in book.pincodes.all %}
+                    <li>{{ pincode.code }}</li>
+                {% empty %}
+                    <li>Not available in any pincode yet.</li>
+                {% endfor %}
+            </ul>
+
+            <!-- Add to Cart Button -->
+            {% if book.quantity > 0 %}
+                <button type="button" class="btn btn-primary mt-3 add-to-cart" data-book-id="{{ book.id }}">
+                    Add to Cart
+                </button>
+            {% else %}
+                <button type="button" class="btn btn-secondary mt-3" disabled>
+                    Out of Stock
+                </button>
+            {% endif %}
+
+
+
+            <!-- Author Info and Publication at bottom -->
+            <hr class="my-4">
+            <div class="author-publication d-flex flex-column flex-md-row align-items-center justify-content-between">
+
+                <!-- Author Info -->
+                <div class="d-flex align-items-center mb-3 mb-md-0">
+                    {% if book.author %}
+                        {% if book.author.author_image %}
+                            <img src="{{ book.author.author_image.url }}" alt="{{ book.author.name }}" class="author-image me-3 rounded-circle" />
+                        {% else %}
+                            <img src="{% static 'img/default-author.png' %}" alt="No author image" class="author-image me-3 rounded-circle" />
+                        {% endif %}
+                        <h5 class="mb-0">Author: {{ book.author.name }}</h5>
+                    {% else %}
+                        <h5>Author: N/A</h5>
+                    {% endif %}
+                </div>
+
+                <!-- Publication -->
+                <div>
+                    <p class="mb-0"><strong>Publication:</strong>
+                        {% if book.publication %}
+                            {{ book.publication.name }}
+                            {% if book.publication.logo %}
+                                <img src="{{ book.publication.logo.url }}" alt="{{ book.publication.name }} Logo" class="publication-logo ms-2" />
+                            {% endif %}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{% block scripts %}
+{% endblock %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const readMoreBtn = document.getElementById('read-more-btn');
+    const readLessBtn = document.getElementById('read-less-btn');
+    const shortDesc = document.getElementById('book-description');
+    const fullDesc = document.getElementById('book-description-full');
+
+    if (readMoreBtn) {
+        readMoreBtn.addEventListener('click', function() {
+            shortDesc.style.display = 'none';
+            fullDesc.style.display = 'block';
+        });
+    }
+
+    if (readLessBtn) {
+        readLessBtn.addEventListener('click', function() {
+            fullDesc.style.display = 'none';
+            shortDesc.style.display = 'block';
+            window.scrollTo({ top: shortDesc.offsetTop - 100, behavior: 'smooth' });
+        });
+    }
+});
+</script>
+
+
+{% endblock %}

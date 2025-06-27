@@ -1,0 +1,332 @@
+{% extends "mybookstall/base.html" %}
+{% load static %}
+{% block content %}
+
+
+<style>
+    #shop{
+        padding-bottom:10%;
+    }
+  .product-div{
+    padding-top:3%;
+    padding-bottom:20%;
+  }
+  .product-card {
+    background-color: #fff;
+    padding: 15px 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-thumbnail {
+    height: 250px;
+    object-fit: cover;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.product-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 10px 0 5px;
+    min-height: 2.5em; /* Keep title area aligned */
+}
+
+.product-price {
+    font-size: 1rem;
+    margin: 10px 0;
+}
+
+.rating-stars i {
+    font-size: 0.85rem;
+}
+
+.icon-cross img {
+    width: 24px;
+    height: 24px;
+}
+
+    #text{
+                font-size:40px;
+                font-family: "Fontdiner Swanky", serif;
+                font-weight: 400;
+                font-style: normal;
+                color:white;
+            }
+                #text1{
+                font-size:40px;
+                font-family: "Fontdiner Swanky", serif;
+                font-weight: 400;
+                font-style: normal;
+                color:black;
+            }
+    .container a{
+      text-decoration:none;
+    }     
+        
+.wishlist-icon {
+  color: grey;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  font-size: 24px;
+}
+
+.wishlist-icon.active {
+  color: red;
+}
+
+
+</style>
+
+        <nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
+
+			<div class="container">
+				<a class="app-logo" href="{% url 'user_dashboard' %}"><img class="logo-icon me-2" src="{% static 'img/logo.png' %}" alt="logo">
+                        <span class="logo-text" id='text'>Book Store</span>
+                    </a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+
+				<div class="collapse navbar-collapse" id="navbarsFurni">
+					<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+						<li>
+							<a class="nav-link" href="{% url 'user_dashboard' %}">Home</a>
+						</li>
+						<li class="nav-item "><a class="nav-link" href="{% url 'shop' %}">Shop</a></li>
+						<li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About us</a></li>
+						<li class="nav-item "><a class="nav-link" href="{% url 'services' %}">Services</a></li>
+						<li class="nav-item active"><a class="nav-link" href="{% url 'blog' %}">Blog</a></li>
+						<li><a class="nav-link" href="{% url 'contact' %}">Contact us</a></li>
+					</ul>
+
+<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+  <!-- Cart icon -->
+<li>
+    <a class="nav-link" href="{% url 'cartview' %}">
+      <img src="{% static 'mybookstall/img/cart.svg' %}" alt="Cart">
+      <span id="cart-count" class="badge bg-danger">
+        {% if request.user.is_authenticated %}
+    {{ request.user.cart.items.count }}
+{% else %}
+    0
+{% endif %}
+
+      </span>
+    </a>
+</li>
+<li class="nav-item position-relative">
+  <a class="nav-link {% if request.resolver_match.url_name == 'wishlist_view' %}active{% endif %}" 
+     href="{% url 'wishlist_view' %}">
+    <img src="{% static 'mybookstall/img/heart.png' %}" alt="Wishlist" style="width: 32px; margin-right: 20px;">
+    <span id="wishlist-count" class="badge bg-warning">
+      {% if request.user.is_authenticated %}
+        {{ request.user.wishlist.count }}
+      {% else %}
+        0
+      {% endif %}
+    </span>
+  </a>
+</li>
+
+  {% if user.is_authenticated %}
+  <!-- User dropdown when logged in -->
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <img src="{% static 'mybookstall/img/user.svg' %}" alt="User">
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+      <li><a class="dropdown-item" href="{% url 'user_profile' %}">Profile</a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-danger" href="{% url 'user_logout' %}">Logout</a></li>
+    </ul>
+  </li>
+  {% else %}
+  <!-- Show Login link if not logged in -->
+ <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <img src="{% static 'mybookstall/img/user.svg' %}" alt="User">
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-danger" href="{% url 'user_login' %}">Login</a></li>
+    </ul>
+  </li>
+  {% endif %}
+</ul>
+
+				</div>
+			</div>
+		</nav>
+
+
+        <div class="blog-container" id='shop'>
+  <div class="blog-header" data-aos="fade-up">
+    <h1>Blog</h1>
+    <p>Stories, reviews, and recommendations from our literary world.</p>
+  </div>
+
+  <div class="blog-grid">
+    <div class="blog-card" data-aos="fade-up">
+      <img src="{% static 'mybookstall/img/blog1.jpg' %}" alt="Book Review">
+      <div class="blog-content">
+        <div class="blog-title">Top 10 Must-Read Books of 2025</div>
+        <div class="blog-meta">By Admin • May 18, 2025 • #Recommendations</div>
+        <div class="blog-summary">
+          Discover the most loved books of the year across genres—from fiction to self-help. A curated list for every reader.
+        </div>
+        <a href="{% url 'shop' %}" class="read-more">Read More →</a>
+      </div>
+    </div>
+
+    <div class="blog-card" data-aos="fade-up" data-aos-delay="100">
+      <img src="{% static 'mybookstall/img/blog2.jpg' %}" alt="Self Publishing">
+      <div class="blog-content">
+        <div class="blog-title">How to Self-Publish Your First Book</div>
+        <div class="blog-meta">By Jane Doe • April 22, 2025 • #Publishing</div>
+        <div class="blog-summary">
+          Are you a writer looking to publish? Learn how Bookstall helps independent authors bring their books to market.
+        </div>
+        <a href="{% url 'shop' %}" class="read-more">Read More →</a>
+      </div>
+    </div>
+
+    <div class="blog-card" data-aos="fade-up" data-aos-delay="200">
+      <img src="{% static 'mybookstall/img/blog3.jpg' %}" alt="Reading Habits">
+      <div class="blog-content">
+        <div class="blog-title">Boost Your Reading Habit in 30 Days</div>
+        <div class="blog-meta">By Team Bookstall • March 15, 2025 • #Tips</div>
+        <div class="blog-summary">
+          Consistent reading improves memory and focus. Follow our 30-day reading challenge to reignite your literary spark.
+        </div>
+        <a href="{% url 'shop' %}" class="read-more">Read More →</a>
+      </div>
+    </div>
+    <div class="blog-card" data-aos="fade-up">
+      <img src="{% static 'mybookstall/img/blog4.jpg' %}" alt="Reading Habits">
+      <div class="blog-content">
+        <div class="blog-title">Top 5 Reading Habits for 2025</div>
+        <div class="blog-meta">By Admin • May 2025 • #Habits</div>
+        <div class="blog-summary">Discover the top reading habits that are transforming how people consume knowledge and entertainment this year.</div>
+        <a href="{% url 'shop' %}" class="read-more">Read More →</a>
+      </div>
+    </div>
+    
+    <div class="blog-card" data-aos="fade-up">
+      <img src="{% static 'mybookstall/img/blog5.jpg' %}" alt="Author Interview">
+      <div class="blog-content">
+        <div class="blog-title">Interview with Bestselling Author</div>
+        <div class="blog-meta">By Editor • Apr 2025 • #Interview</div>
+        <div class="blog-summary">A candid conversation with one of India's top fiction writers about storytelling, publishing, and inspiration.</div>
+        <a href="{% url 'shop' %}" class="read-more">Read More →</a>
+      </div>
+    </div>
+    <div class="blog-card" data-aos="fade-up">
+      <img src="{% static 'mybookstall/img/blog6.jpg' %}" alt="Children’s Books">
+      <div class="blog-content">
+        <div class="blog-title">Why Children Need More Books, Not Screens</div>
+        <div class="blog-meta">By Priya Mehta • Mar 2025 • #Parenting</div>
+        <div class="blog-summary">Explore the importance of storytelling, imagination, and early reading in a digital-first generation.</div>
+        <a href="{% url 'shop' %}" class="read-more">Read More →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+  AOS.init({ duration: 800, once: true });
+</script>
+
+
+  <style>
+    .blog-container {
+      max-width: 1200px;
+      margin: 60px auto;
+      padding: 0 20px;
+    }
+
+    .blog-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .blog-header h1 {
+      font-size: 48px;
+      color: black;
+    }
+
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+    }
+
+    .blog-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    .blog-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    .blog-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .blog-content {
+      padding: 20px;
+    }
+
+    .blog-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .blog-meta {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 12px;
+    }
+
+    .blog-summary {
+      font-size: 15px;
+      color: #444;
+      line-height: 1.6;
+    }
+
+    .read-more {
+      display: inline-block;
+      margin-top: 16px;
+      color: #3f51b5;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    @media (max-width: 600px) {
+      .blog-header h1 {
+        font-size: 32px;
+      }
+    }
+  </style>
+
+
+{% endblock %}        

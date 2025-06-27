@@ -1,0 +1,263 @@
+{% extends "mybookstall/base.html" %}
+{% load static %}
+{% block content %}
+
+
+<style>
+    #shop{
+        padding-bottom:10%;
+    }
+  .product-div{
+    padding-top:3%;
+    padding-bottom:20%;
+  }
+  .product-card {
+    background-color: #fff;
+    padding: 15px 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-thumbnail {
+    height: 250px;
+    object-fit: cover;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.product-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 10px 0 5px;
+    min-height: 2.5em; /* Keep title area aligned */
+}
+
+.product-price {
+    font-size: 1rem;
+    margin: 10px 0;
+}
+
+.rating-stars i {
+    font-size: 0.85rem;
+}
+
+.icon-cross img {
+    width: 24px;
+    height: 24px;
+}
+
+    #text{
+                font-size:40px;
+                font-family: "Fontdiner Swanky", serif;
+                font-weight: 400;
+                font-style: normal;
+                color:white;
+            }
+                #text1{
+                font-size:40px;
+                font-family: "Fontdiner Swanky", serif;
+                font-weight: 400;
+                font-style: normal;
+                color:black;
+            }
+    .container a{
+      text-decoration:none;
+    }     
+        
+.wishlist-icon {
+  color: grey;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  font-size: 24px;
+}
+
+.wishlist-icon.active {
+  color: red;
+}
+
+
+</style>
+
+        <nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
+
+			<div class="container">
+				<a class="app-logo" href="{% url 'user_dashboard' %}"><img class="logo-icon me-2" src="{% static 'img/logo.png' %}" alt="logo">
+                        <span class="logo-text" id='text'>Book Store</span>
+                    </a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+
+				<div class="collapse navbar-collapse" id="navbarsFurni">
+					<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+						<li>
+							<a class="nav-link" href="{% url 'user_dashboard' %}">Home</a>
+						</li>
+						<li class="nav-item"><a class="nav-link" href="{% url 'shop' %}">Shop</a></li>
+						<li><a class="nav-link" href="{% url 'about' %}">About us</a></li>
+						<li><a class="nav-link" href="{% url 'services' %}">Services</a></li>
+						<li><a class="nav-link" href="{% url 'blog' %}">Blog</a></li>
+						<li><a class="nav-link" href="{% url 'contact' %}">Contact us</a></li>
+					</ul>
+
+<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+  <!-- Cart icon -->
+<li>
+    <a class="nav-link" href="{% url 'cartview' %}">
+      <img src="{% static 'mybookstall/img/cart.svg' %}" alt="Cart">
+      <span id="cart-count" class="badge bg-danger">
+        {% if request.user.is_authenticated %}
+    {{ request.user.cart.items.count }}
+{% else %}
+    0
+{% endif %}
+
+      </span>
+    </a>
+</li>
+<li class="nav-item position-relative">
+  <a class="nav-link {% if request.resolver_match.url_name == 'wishlist_view' %}active{% endif %}" 
+     href="{% url 'wishlist_view' %}">
+    <img src="{% static 'mybookstall/img/heart.png' %}" alt="Wishlist" style="width: 32px; margin-right: 20px;">
+    <span id="wishlist-count" class="badge bg-warning">
+      {% if request.user.is_authenticated %}
+        {{ request.user.wishlist.count }}
+      {% else %}
+        0
+      {% endif %}
+    </span>
+  </a>
+</li>
+
+  {% if user.is_authenticated %}
+  <!-- User dropdown when logged in -->
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <img src="{% static 'mybookstall/img/user.svg' %}" alt="User">
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+      <li><a class="dropdown-item" href="{% url 'user_profile' %}">Profile</a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-danger" href="{% url 'user_logout' %}">Logout</a></li>
+    </ul>
+  </li>
+  {% else %}
+  <!-- Show Login link if not logged in -->
+ <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <img src="{% static 'mybookstall/img/user.svg' %}" alt="User">
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item text-danger" href="{% url 'user_login' %}">Login</a></li>
+    </ul>
+  </li>
+  {% endif %}
+</ul>
+
+				</div>
+			</div>
+		</nav>
+        <div class="container mt-5 mb-5" id="shop">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <div class="card shadow-sm rounded">
+        <div class="card-body border-bottom">
+          <h4 class="mb-3">Edit Your Profile</h4>
+
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Profile Image -->
+            <div class="mb-3 d-flex align-items-center">
+              {% if profile.profile_image %}
+                <img src="{{ profile.profile_image.url }}" class="rounded-circle me-3" width="80" height="80" alt="Profile Image">
+              {% else %}
+                <img src="https://static-assets-web.flixcart.com/fk-p-linchpin-web/fk-cp-zion/img/profile-pic-male_4811a1.svg" class="rounded-circle me-3" width="80" height="80" alt="Profile Image">
+              {% endif %}
+              <div>
+                <input class="form-control" type="file" name="profile_image">
+                {% if profile.profile_image %}
+                  <button type="submit" name="remove_image" class="btn btn-sm btn-outline-danger mt-2">Remove Image</button>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- First Name -->
+            <div class="mb-3">
+              <label for="first_name" class="form-label">First Name</label>
+              <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}" required>
+            </div>
+
+            <!-- Last Name -->
+            <div class="mb-3">
+              <label for="last_name" class="form-label">Last Name</label>
+              <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}" required>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+            </div>
+
+            <!-- Phone -->
+            {% comment %} <div class="mb-3">
+              <label for="phone_number" class="form-label">Phone Number</label>
+              <input type="text" name="phone_number" class="form-control" value="{{ profile.phone_number }}">
+            </div>
+
+            <!-- Address -->
+            <div class="mb-3">
+              <label for="address" class="form-label">Address</label>
+              <textarea name="address" class="form-control" rows="2">{{ profile.address }}</textarea>
+            </div> {% endcomment %}
+
+            <!-- Country -->
+            {% comment %} <div class="mb-3">
+               <label for="id_country">Country</label>
+        <select class="form-select" name="country">
+            <option value="India" {% if profile.country == "India" %}selected{% endif %}>India</option>
+            <option value="United States" {% if profile.country == "United States" %}selected{% endif %}>United States</option>
+            <option value="United Kingdom" {% if profile.country == "United Kingdom" %}selected{% endif %}>United Kingdom</option>
+            <option value="Australia" {% if profile.country == "Australia" %}selected{% endif %}>Australia</option>
+            <option value="Canada" {% if profile.country == "Canada" %}selected{% endif %}>Canada</option>
+        </select>
+
+            </div> {% endcomment %}
+
+            <!-- Gender -->
+            <div class="mb-3">
+              <label for="gender" class="form-label">Gender</label>
+              <select name="gender" class="form-select">
+                <option value="">Select Gender</option>
+                <option value="Male" {% if profile.gender == "Male" %}selected{% endif %}>Male</option>
+                <option value="Female" {% if profile.gender == "Female" %}selected{% endif %}>Female</option>
+                <option value="Other" {% if profile.gender == "Other" %}selected{% endif %}>Other</option>
+              </select>
+            </div>
+
+            <!-- Submit -->
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'user_profile' %}" class="btn btn-secondary">Cancel</a>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

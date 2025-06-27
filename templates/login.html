@@ -1,0 +1,223 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Store</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(
+                rgba(43, 112, 56, 0.6),
+                rgba(234, 146, 130, 0.8)
+            ),
+            url('https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg') no-repeat center center;
+            background-size: cover;
+        }
+        
+        .hero-card {
+            width: 100%;
+            height: 20rem;
+            background-color: rgba(0, 123, 255, 0.75);
+        }
+       
+        .btn{
+            background-color:#15a362;
+            color:white;
+        }
+        .btn:hover{
+            background-color: #128154;
+            color:white;  
+
+        }
+        
+    </style>
+    <link rel="icon" type="image/png"  href="{% static 'img/logo.png' %}">
+
+</head>
+<body>
+
+<div class="container-fluid p-0" style="height: 100vh; overflow: hidden;">
+    <div class="row g-0 h-100">
+
+        <!-- Left Form Section -->
+        <div class="col-md-7 d-flex align-items-center justify-content-center h-100">
+            <div class="w-100" style="max-width: 450px;">
+                <div class="card border-0 p-4 shadow-sm">
+                    <div class="card-body">
+                        <!-- Toast Container -->
+                        <div class="position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="toast show shadow-lg rounded-3 border-0 animate__animated animate__fadeInUp"
+                                         role="alert" aria-live="assertive" aria-atomic="true"
+                                         style="min-width: 300px; background: linear-gradient(135deg, #15a362 0%, #128456 100%); color: #fff;">
+                                        <div class="d-flex">
+                                            <div class="toast-body">
+                                                {{ message }}
+                                            </div>
+                                            <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                                                    data-bs-dismiss="toast" aria-label="Close"></button>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        
+        {% if error %}
+        <p class="error-message">{{ error }}</p>
+    {% endif %}
+
+                        <div class="mb-4">
+                            <h2 class="fw-bold mb-2">Login to your Account</h2>
+                            <p class="text-muted">Please enter your details to Log in</p>
+                        </div>
+
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email">
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password">
+                            </div>
+
+                            <div class="d-flex justify-content-end mb-4">
+                                <a href="{% url 'forgot_password' %}" class="text-decoration-none">Forgot password?</a>
+                            </div>
+
+                            <div class="d-grid gap-2 mb-4">
+                                <button type="submit" class="btn">Login</button>
+                            </div>
+                            <div class="d-flex justify-content-end mb-4">
+                                <p>You Don't have account?</p>&nbsp;
+                                <a href="{% url 'seller_registration' %}" class="text-decoration-none">Click Here</a>
+                            </div>
+
+                             
+                        </form>
+
+                    </div>
+                </div>
+
+                
+            </div>
+        </div>
+
+        <!-- Right Banner Section -->
+        <div class="col-md-5 d-none d-md-flex flex-column align-items-center justify-content-center h-100 text-white hero-section">
+            <div class="text-center p-5">
+                <h2 class="display-5 fw-bold mb-4">Book Store</h2>
+                <p class="lead mb-5">Find Your Next Great Read - One Page at a Time!</p>
+                {% comment %} <div class="card bg-opacity-75 shadow hero-card">
+                    <div class="card-body d-flex align-items-center justify-content-center">
+                        <span style="font-size: 4rem;">📚</span>
+                    </div>
+                </div> {% endcomment %}
+            </div>
+
+           
+        </div>
+
+    </div>
+</div>
+<div id="loader" class="loader-overlay" style="display: none;">
+    <div class="spinner"></div>
+</div>
+<style>
+
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.spinner {
+    width: 45px;
+    height: 45px;
+    border: 4px solid #ccc;
+    border-top-color: #15a362;
+    border-radius: 100%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+             
+        
+    </style>
+     
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const loader = document.getElementById('loader');
+            const body = document.body;
+        
+            // Show loader for link clicks
+            document.querySelectorAll('a').forEach(function (link) {
+                link.addEventListener('click', function (e) {
+                    const href = link.getAttribute('href');
+                    if (!href || href.startsWith('#') || link.classList.contains('no-loader')) return;
+        
+                    e.preventDefault();
+                    loader.style.display = 'flex';
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 300);
+                });
+            });
+        
+            // Show loader for form submits
+            document.querySelectorAll('form').forEach(function (form) {
+                form.addEventListener('submit', function () {
+                    loader.style.display = 'flex';
+                });
+            });
+        
+            // Loader and fade-in on normal load
+            window.addEventListener('load', function () {
+                loader.style.display = 'none';
+                body.classList.add('loaded');
+            });
+        
+            // Handle browser forward/back navigation
+            window.addEventListener('pageshow', function (event) {
+                const navType = performance.getEntriesByType("navigation")[0].type;
+        
+                if (event.persisted || navType === "back_forward") {
+                    // Don't show loader on cached pages (back/forward restored instantly)
+                    loader.style.display = 'none';
+                    body.classList.add('loaded');
+                } else {
+                    // Page was not restored from cache — show loader for forward button
+                    loader.style.display = 'flex';
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                        body.classList.add('loaded');
+                    }, 400); // spinner visible for a short time
+                }
+            });
+        });
+        </script>
+        
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+</body>
+</html>
