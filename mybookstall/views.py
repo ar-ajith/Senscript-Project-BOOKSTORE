@@ -133,6 +133,8 @@ class UserDashboardView(View):
         else:
             user_wishlist_book_ids = []
             user_ratings = Rating.objects.none()
+        user_count=CustomUser.objects.filter(role='user').count() 
+        book_count=Book.objects.filter(status='approved').count()
 
 
         recent_cutoff = timezone.now() - timedelta(days=7)
@@ -191,6 +193,8 @@ class UserDashboardView(View):
             'user_ratings': user_ratings,
             'bookstore_reviews':bookstore_reviews,
             'bookstore_avg_rating':bookstore_avg_rating,
+            'user_count':user_count,
+            'book_count':book_count,
 
         })
 
