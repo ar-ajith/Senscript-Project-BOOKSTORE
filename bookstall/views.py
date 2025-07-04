@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate,login,logout
 from .serializers import SellerSerializer
-from .models import CustomUser,Book,Category,Pincode,RejectedBook,Userprofile,Coupon,BookOrder,Rating,Author,Publication
+from .models import CustomUser,Book,Category,Pincode,RejectedBook,Userprofile,Coupon,BookOrder,Rating,Author,Publication,ChatMessage,ChatRoom
 from django.shortcuts import render,redirect,get_object_or_404
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -12,7 +12,7 @@ from django.core.exceptions import PermissionDenied
 from decimal import Decimal
 from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
-from django.views.generic import UpdateView,ListView,TemplateView,DetailView,CreateView
+from django.views.generic import UpdateView,ListView,TemplateView,DetailView
 from django.urls import reverse_lazy,reverse
 from .utils import EmailThread
 from django.db.models import Q
@@ -959,8 +959,22 @@ class ResetPasswordView(View):
         except (CustomUser.DoesNotExist, ValueError, TypeError, OverflowError):
             return render(request, 'reset_password.html', {'validlink': False})
         
+class AdminChatListView(View):
+    def get(self, request):
+        users = CustomUser.objects.filter(is_staff=False)
+        return render(request, "chat_user_list.html", {"users": users})
 
-
+class AdminChatView(View):
+    def get(self, request, user_id):
+        user = CustomUser.objects.get(id=user_id)
+        room_name = f"user_{user.id}_admin"
+        room, _ = ChatRoom.objects.get_or_create(room_name=room_name)
+        messages = ChatMessage.objects.filter(room=room)
+        return render(request, "chat.html", {
+            "room_name": room_name,
+            "messages": messages,
+            "target_user": user,
+        })
 
 class LogoutView(View):
     def get(self, request):

@@ -314,4 +314,17 @@ class BookstoreReview(models.Model):
 
 
 
-    
+class ChatRoom(models.Model):
+    room_name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.room_name
+
+class ChatMessage(models.Model):
+    room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE,null=True,blank=True)
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.sender} in {self.room}: {self.message[:20]}"

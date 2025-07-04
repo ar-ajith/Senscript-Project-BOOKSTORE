@@ -367,18 +367,23 @@ ul li {
             <div class="author-publication d-flex flex-column flex-md-row align-items-center justify-content-between">
 
                 <!-- Author Info -->
+                {% if author and author.id %}
+                    <a href="{% url 'author_books' author.id %}">
                 <div class="d-flex align-items-center mb-3 mb-md-0">
                     {% if book.author %}
+
                         {% if book.author.author_image %}
                             <img src="{{ book.author.author_image.url }}" alt="{{ book.author.name }}" class="author-image me-3 rounded-circle" />
                         {% else %}
                             <img src="{% static 'img/default-author.png' %}" alt="No author image" class="author-image me-3 rounded-circle" />
                         {% endif %}
-                        <h5 class="mb-0">Author: {{ book.author.name }}</h5>
+                        <h5 class="mb-0">{{ book.author.name }}</h5>
                     {% else %}
                         <h5>Author: N/A</h5>
                     {% endif %}
                 </div>
+            </a>
+            {% endif %}
 
                 <!-- Publication -->
                 <div>

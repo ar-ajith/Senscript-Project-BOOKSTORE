@@ -41,6 +41,7 @@ REST_FRAMEWORK = {
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -53,6 +54,9 @@ INSTALLED_APPS = [
     'bookstall',
     'bookstall_user',
     'mybookstall',
+    'channels',
+    'chatapp',
+
 ]
 
 MIDDLEWARE = [
@@ -87,7 +91,13 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'ecommerce.wsgi.application'
+WSGI_APPLICATION = 'ecommerce.wsgi.application'
+ASGI_APPLICATION = 'ecommerce.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {"BACKEND":"channels.layers.InMemoryChannelLayer"},
+}
+
 
 
 # Database

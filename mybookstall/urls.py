@@ -37,5 +37,6 @@ urlpatterns = [
     path('ratings/user/<int:user_id>/', RatingListView.as_view(), name='user_rating_list'),
     path('review/submit/', BookstoreReviewView.as_view(), name='submit-website-review'),
     path("user_logout/",LogoutView.as_view(),name="user_logout"),
+    path("chat/modal/", UserChatModalView.as_view(), name="user_chat_modal"),
 
 ]

@@ -38,4 +38,7 @@ urlpatterns = [
     path('pending_orders/<int:pk>/confirm/', ConfirmOrderView.as_view(), name='confirm_order'),   
     path('users/', UserListView.as_view(), name='user_list'),
     path('ratings/', RatingListView.as_view(), name='rating'),
-    path("logout/",LogoutView.as_view(),name="logout"),]
+    path("logout/",LogoutView.as_view(),name="logout"),
+    path("chats/", AdminChatListView.as_view(), name="admin_chat_list"),
+    path("chat/<int:user_id>/", AdminChatView.as_view(), name="admin_chat_view"),
+    ]

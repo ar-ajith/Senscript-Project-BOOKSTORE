@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from bookstall.models import CustomUser,Book,Category,Cart,CartItem,Author,Wishlist,Coupon,Userprofile,BookOrder,PAYMENT_METHOD_CHOICES,Rating,BookstoreReview,ShippingAddress
+from bookstall.models import CustomUser,Book,Category,Cart,CartItem,Author,Wishlist,Coupon,Userprofile,BookOrder,PAYMENT_METHOD_CHOICES,Rating,BookstoreReview,ShippingAddress,ChatMessage,ChatRoom
 from django.views.generic import View,ListView,TemplateView,DetailView
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -539,11 +539,20 @@ class ShopView(ListView):
 
         return context
     
+
+    
 class BookDetailView(DetailView):
     model=Book
     template_name='mybookstall/book_detail.html'
     context_object_name='book'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        book = self.get_object()
+        context['author'] = book.author 
+        return context
+
+    
 
 class AuthorBooksView(ListView):
     model=Book
@@ -552,10 +561,10 @@ class AuthorBooksView(ListView):
 
     def get_queryset(self):
         return Book.objects.filter(author_id=self.kwargs['author_id'])
-    
+        
     def get_context_data(self, **kwargs):
         context=super().get_context_data(**kwargs)
-        
+
         if self.request.user.is_authenticated:
             wishlist_books = Wishlist.objects.filter(user=self.request.user).values_list('book_id', flat=True)
             context['user_wishlist_book_ids'] = list(wishlist_books)
@@ -566,8 +575,6 @@ class AuthorBooksView(ListView):
 
 
 class WishlistView(LoginRequiredMixin, View):
-    
-    
     def post(self, request, *args, **kwargs):
         book_id = request.POST.get('book_id')
         if not book_id:
@@ -825,7 +832,7 @@ class CheckoutView(View):
 
         address_id = request.session.get("selected_shipping_address")
         if not address_id:
-            return JsonResponse({'success': False, 'message': 'No shipping address selected.'})
+            return JsonResponse({'success': False, 'message': 'No shipping address selected.'}) 
 
         try:
             shipping_address = ShippingAddress.objects.get(id=address_id, user=user)
@@ -1103,3 +1110,15 @@ class DeleteShippingAddressView(LoginRequiredMixin, View):
         address.delete()
         messages.success(request, "Shipping address deleted successfully.")
         return redirect('user_profile')
+    
+
+class UserChatModalView(View):
+    def get(self, request):
+        user = request.user
+        room_name = f"user_{user.id}_admin"
+        room, _ = ChatRoom.objects.get_or_create(room_name=room_name)
+        messages = ChatMessage.objects.filter(room=room)
+        return render(request, "mybookstall/otherfiles/chat_modal.html", {
+            "room_name": room_name,
+            "messages": messages,
+        })

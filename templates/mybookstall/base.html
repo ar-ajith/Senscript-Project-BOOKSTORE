@@ -120,6 +120,29 @@ body.loading #loading-screen {
 
                 
 
+                #chatIcon {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 55px;
+  height: 55px;
+  background-color: #ff5722;
+  color: white;
+  font-size: 26px;
+  text-align: center;
+  line-height: 55px;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  z-index: 999;
+  transition: background-color 0.3s ease;
+}
+
+#chatIcon:hover {
+  background-color: #e64a19;
+}
+
+
             </style>
 </head>
 <body >
@@ -180,66 +203,80 @@ body.loading #loading-screen {
     </div>
 
     <div class="row g-5 mb-5">
-      <div class="col-lg-4">
+      <div>
         <div class="mb-4 footer-logo-wrap">
           <a class="app-logo" href="{% url 'user_dashboard' %}"><img class="logo-icon me-2" src="{% static 'img/logo.png' %}" alt="logo">
                         <span class="logo-text" id='text1'>Book Store</span>
                     </a>
         </div>
         <p class="mb-4">
-          Your go-to destination for bestsellers, classics, educational books, and more. Explore a world of stories, knowledge, and inspiration all in one place.
-        </p>
-<ul class="list-unstyled custom-social d-flex">
+  Your go-to destination for bestsellers, timeless classics, educational resources, and hidden literary gems. Whether you're a casual reader, a student, or a lifelong book enthusiast, our bookstore offers a curated collection to inspire, inform, and entertain. Explore a world of stories, knowledge, and imagination — all in one convenient place.
+</p>
+
+
+
+      
+       <ul class="list-unstyled d-flex"style='padding-top:10px;justify-content:center;'>
+              <li><a href="{% url 'about' %}"style='margin-right:2rem;'>About us</a></li>
+              <li><a href="{% url 'services' %}"style='margin-right:2rem;'>Services</a></li>
+              <li><a href="{% url 'blog' %}"style='margin-right:2rem;'>Blog</a></li>
+            
+              
+
+<!-- Somewhere in navbar or footer -->
+<div id="chat-icon" style="position: fixed; bottom: 20px; right: 20px; cursor: pointer; z-index: 9999;">
+  <img src="{% static 'mybookstall/img/chat.png' %}" width="60" height="60" alt="Chat">
+</div>
+<div id="chat-popup-container"></div>
+
+
+              <li><a href="{% url 'contact' %}"style='margin-right:2rem;'>Contact us</a></li>
+            </ul>
+
+      <ul class="list-unstyled custom-social d-flex"style='padding-top:10px;justify-content:center;'>
   <li class="me-3"><a href="#"><span class="fab fa-facebook-f"></span></a></li>
   <li class="me-3"><a href="#"><span class="fab fa-twitter"></span></a></li>
   <li class="me-3"><a href="#"><span class="fab fa-instagram"></span></a></li>
   <li><a href="#"><span class="fab fa-linkedin"></span></a></li>
 </ul>
+    </div>
+    </div>
 
-      </div>
-
-      <div class="col-lg-8">
-        <div class="row links-wrap">
-          <div class="col-6 col-sm-6 col-md-3">
-            <ul class="list-unstyled">
-              <li><a href="{% url 'about' %}">About us</a></li>
-              <li><a href="{% url 'services' %}">Services</a></li>
-              <li><a href="{% url 'blog' %}">Blog</a></li>
-              <li><a href="{% url 'contact' %}">Contact us</a></li>
-            </ul>
-          </div>
-          <div class="col-6 col-sm-6 col-md-3">
-            <ul class="list-unstyled">
-              <li><a href="#">Support</a></li>
-              <li><a href="#">Knowledge base</a></li>
-              <li><a href="#">Live chat</a></li>
-            </ul>
-          </div>
-          <div class="col-6 col-sm-6 col-md-3">
-            <ul class="list-unstyled">
-              <li><a href="#">Jobs</a></li>
-              <li><a href="#">Our team</a></li>
-              <li><a href="#">Leadership</a></li>
-              <li><a href="/account/shipping-policy" class="no-loader" data-bs-toggle="modal" data-bs-target="#shippingPolicyModal">Shipping Policy</a></li>
-              
-                <!-- Shipping Policy Modal -->
+    <div class="border-top pt-4 mt-4 copyright">
+      <div class="row">
+        <div class="col-lg-6 text-center text-lg-start">
+          <p class="mb-2">
+            Copyright &copy;<script>document.write(new Date().getFullYear());</script>.
+            All Rights Reserved. &mdash; Designed with love by 
+            <a href="https://senscript.ai/">Senscript</a>
+          </p>
+        </div>
+        <div class="col-lg-6 text-center text-lg-end">
+          <ul class="list-unstyled d-inline-flex ms-auto">
+            
+            <li class="me-4">
+              <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms &amp; Conditions</a>
+            </li>
+            <li><a href="/account/shipping-policy" class="no-loader" data-bs-toggle="modal" data-bs-target="#shippingPolicyModal">Shipping Policy</a></li>
+           
+                            <!-- Shipping Policy Modal -->
 <div class="modal fade" id="shippingPolicyModal" tabindex="-1" aria-labelledby="shippingPolicyModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="shippingPolicyModalLabel">
-          <i class="bi bi-truck me-2 text-primary"></i>Shipping Policy
+        <h5 class="modal-title w-100 text-center" id="shippingPolicyModalLabel">
+          <i class="bi bi-truck me-2 text-primary "></i>Shipping Policy
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
-      <div class="modal-body">
+      <div class="modal-body text-center">
         <div class="card mb-3">
           <div class="card-body">
             <h6 class="card-title">Delivery Timeframes</h6>
             <p class="card-text">
               Orders are processed in 1-2 business days.
-              <ul>
+              <ul class="list-unstyled">
                 <li>Metro Cities: 2–4 business days</li>
                 <li>Other Areas: 4–7 business days</li>
               </ul>
@@ -279,39 +316,76 @@ body.loading #loading-screen {
     </div>
   </div>
 </div>
+           
+<!-- Terms & Conditions Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+    <div class="modal-content">
+      <!-- Header -->
+      <div class="modal-header text-black">
+        <h5 class="modal-title w-100 text-center" id="termsModalLabel">
+          <i class="bi bi-journal-check me-2"></i>Terms & Conditions
+        </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body d-flex flex-column align-items-center">
+        <div class="card mb-3 w-100" style="max-width: 700px;">
+          <div class="card-body text-center">
+            <p class="card-text mb-3">
+              Welcome to our Bookstore. By accessing or using this platform, you agree to the following terms:
+            </p>
+            <ul class="text-start mx-auto" style="max-width: 500px;">
+              <li>📌 Books uploaded by sellers are subject to admin approval.</li>
+              <li>🔒 Users must not duplicate or redistribute content without permission.</li>
+              <li>🎟️ Coupons are applied as per admin-defined rules.</li>
+              <li>⚠️ Violation of policies may result in account suspension.</li>
+              <li>🔐 User data is handled per our privacy policy.</li>
             </ul>
           </div>
-          <div class="col-6 col-sm-6 col-md-3">
-            <ul class="list-unstyled">
-              <li><a href="#">Nordic Chair</a></li>
-              <li><a href="#">Kruzo Aero</a></li>
-              <li><a href="#">Ergonomic Chair</a></li>
-            </ul>
+        </div>
+
+        <div class="card mb-3 w-100" style="max-width: 700px;">
+          <div class="card-body text-center">
+            <h6 class="card-title fw-semibold">Account Responsibility</h6>
+            <p class="card-text">Users are responsible for keeping their login credentials confidential.</p>
+          </div>
+        </div>
+
+        <div class="card mb-3 w-100" style="max-width: 700px;">
+          <div class="card-body text-center">
+            <h6 class="card-title fw-semibold">Service Availability</h6>
+            <p class="card-text">We may update or suspend services without prior notice for maintenance.</p>
+          </div>
+        </div>
+
+        <div class="card mb-3 w-100" style="max-width: 700px;">
+          <div class="card-body text-center">
+            <h6 class="card-title fw-semibold">Policy Updates</h6>
+            <p class="card-text">Terms may change over time. Please review them periodically.</p>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="border-top pt-4 mt-4 copyright">
-      <div class="row">
-        <div class="col-lg-6 text-center text-lg-start">
-          <p class="mb-2">
-            Copyright &copy;<script>document.write(new Date().getFullYear());</script>.
-            All Rights Reserved. &mdash; Designed with love by 
-            <a href="https://senscript.ai/">Senscript</a>
-          </p>
-        </div>
-        <div class="col-lg-6 text-center text-lg-end">
-          <ul class="list-unstyled d-inline-flex ms-auto">
-            <li class="me-4"><a href="#">Terms &amp; Conditions</a></li>
-            <li><a href="/account/shipping-policy" class="" data-bs-toggle="modal" data-bs-target="#shippingPolicyModal">Shipping Policy</a></li>
+      <!-- Optional Footer (Centered) -->
+     
+    </div>
+  </div>
+</div>
+
+
+
+
           </ul>
         </div>
       </div>
     </div>
 
   </div>
+</div>
+
 </footer>
 <!-- End Footer Section -->
 
@@ -496,6 +570,38 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
+<script>
+  document.getElementById("chat-icon").addEventListener("click", function() {
+    // Check if already open
+    if (document.getElementById("chatPopup")) {
+      document.getElementById("chatPopup").style.display = "block";
+      return;
+    }
+
+    fetch("{% url 'user_chat_modal' %}")
+  .then(response => {
+    if (!response.ok) throw new Error("Failed to load chat.");
+    return response.text();
+  })
+  .then(html => {
+    document.getElementById("chat-popup-container").innerHTML = html;
+
+    // ✅ Force re-execution of <script> tags inside the loaded HTML
+    const scripts = document.getElementById("chat-popup-container").getElementsByTagName("script");
+    for (let i = 0; i < scripts.length; i++) {
+      const newScript = document.createElement("script");
+      newScript.text = scripts[i].text;
+      document.body.appendChild(newScript);
+    }
+  })
+  .catch(error => {
+    console.error("Error loading chat:", error);
+  });
+  });
+</script>
+
+
 
 
 
