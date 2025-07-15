@@ -24,6 +24,7 @@ urlpatterns = [
     path('apply-coupon/', ApplyCouponView.as_view(), name='apply_coupon'),
     path('cart/remove-coupon/', RemoveCouponView.as_view(), name='remove_coupon'),
     path('checkout/', CheckoutView.as_view(), name='checkout'),
+    path('razorpay/confirm/', RazorpayOrderConfirmView.as_view(), name='razorpay_order_confirm'),
     path('delete-shipping-address/<int:pk>/', DeleteShippingAddressView.as_view(), name='delete_shipping_address'),
     path("save-shipping-address/", SaveShippingAddressView.as_view(), name="save_shipping_address"),
     path('track-order/', TrackOrderView.as_view(), name='track_order'),
@@ -38,5 +39,6 @@ urlpatterns = [
     path('review/submit/', BookstoreReviewView.as_view(), name='submit-website-review'),
     path("user_logout/",LogoutView.as_view(),name="user_logout"),
     path("chat/modal/", UserChatModalView.as_view(), name="user_chat_modal"),
+    path("convert/", CurrencyConvertView.as_view(), name="convert_currency"),
 
 ]

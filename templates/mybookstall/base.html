@@ -211,7 +211,7 @@ body.loading #loading-screen {
         </div>
         <p class="mb-4">
   Your go-to destination for bestsellers, timeless classics, educational resources, and hidden literary gems. Whether you're a casual reader, a student, or a lifelong book enthusiast, our bookstore offers a curated collection to inspire, inform, and entertain. Explore a world of stories, knowledge, and imagination — all in one convenient place.
-</p>
+</p> 
 
 
 
@@ -224,13 +224,33 @@ body.loading #loading-screen {
               
 
 <!-- Somewhere in navbar or footer -->
+<!-- Chat Icon -->
 <div id="chat-icon" style="position: fixed; bottom: 20px; right: 20px; cursor: pointer; z-index: 9999;">
-  <img src="{% static 'mybookstall/img/chat.png' %}" width="60" height="60" alt="Chat">
+    <img src="{% static 'mybookstall/img/chat.png' %}" width="60" height="60" alt="Chat">
+  </a>
 </div>
+
+<!-- 💱 Convert Floating Button -->
+<div id="convert-icon" style="position: fixed; bottom: 90px; right: 20px; cursor: pointer; z-index: 9999;">
+  <img src="{% static 'mybookstall/img/convert.png' %}" width="65" height="65" alt="Convert" onclick="loadCurrencyModal()">
+</div>
+
+<!-- 💱 Currency Modal Container -->
+<div id="currencyModalWrapper" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6); z-index: 10000; justify-content: center; align-items: center;">
+  <div id="currencyModalContent" style="position: relative; padding: 20px; background: white; border-radius: 10px;">
+    <span onclick="closeCurrencyModal()" style="position: absolute; top: 10px; right: 15px; font-size: 22px; cursor: pointer;">&times;</span>
+    <!-- AJAX content will load here -->
+  </div>
+</div>
+
+
 <div id="chat-popup-container"></div>
 
 
               <li><a href="{% url 'contact' %}"style='margin-right:2rem;'>Contact us</a></li>
+              
+
             </ul>
 
       <ul class="list-unstyled custom-social d-flex"style='padding-top:10px;justify-content:center;'>
@@ -601,7 +621,47 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 </script>
 
+<script>
+  function loadCurrencyModal() {
+    fetch("{% url 'convert_currency' %}")
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById("currencyModalContent").innerHTML += html;
+        document.getElementById("currencyModalWrapper").style.display = "flex";
+      })
+      .catch(err => console.error("Failed to load converter:", err));
+  }
 
+  function closeCurrencyModal() {
+    document.getElementById("currencyModalWrapper").style.display = "none";
+    document.getElementById("currencyModalContent").innerHTML = `<span onclick="closeCurrencyModal()" style="position: absolute; top: 10px; right: 15px; font-size: 22px; cursor: pointer;">&times;</span>`;
+  }
+
+  function convertCurrency() {
+    const amount = document.getElementById("amount").value;
+    const currency = document.getElementById("currency").value;
+
+    if (!amount || amount <= 0) {
+      document.getElementById("convertedResult").innerText = "Please enter a valid amount.";
+      return;
+    }
+
+    fetch(`/convert/?amount=${amount}&currency=${currency}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.converted_price) {
+          document.getElementById("convertedResult").innerText =
+            `Converted: ${data.converted_price} ${data.currency} (Rate: ${data.rate})`;
+        } else {
+          document.getElementById("convertedResult").innerText = "Error: " + data.error;
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById("convertedResult").innerText = "Something went wrong.";
+      });
+  }
+</script>
 
 
 

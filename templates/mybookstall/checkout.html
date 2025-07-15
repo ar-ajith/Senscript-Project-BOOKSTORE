@@ -256,144 +256,137 @@
 			</div>
 		</nav>
 
-<!-- Step Navigation UI -->
-<!-- Step Indicator -->
 <div class="step-indicator-wrapper">
   <div class="step-indicator">
-    <div class="step active">
-      <div class="step-icon">1</div>
-      <div class="step-text">Shipping</div>
-    </div>
+    <div class="step active"><div class="step-icon">1</div><div class="step-text">Shipping</div></div>
     <div class="progress-line"></div>
-    <div class="step active">
-      <div class="step-icon">2</div>
-      <div class="step-text">Payment</div>
-    </div>
+    <div class="step active"><div class="step-icon">2</div><div class="step-text">Payment</div></div>
     <div class="progress-line"></div>
-    <div class="step">
-      <div class="step-icon">3</div>
-      <div class="step-text">Confirmation/Rating</div>
-    </div>
+    <div class="step"><div class="step-icon">3</div><div class="step-text">Confirmation/Rating</div></div>
   </div>
 </div>
 
-
-        <!-- templates/checkout.html -->
+<!-- Checkout Form -->
 <div id="shop" style="max-width: 600px; margin: 40px auto; background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
     <h2 style="text-align: center; margin-bottom: 30px;">Checkout</h2>
     <form method="post" id="checkoutForm">
         {% csrf_token %}
-        
         <div style="margin-bottom: 20px;">
-            <label for="payment_method" style="display: block; margin-bottom: 8px;">Select Payment Method</label>
-            <select name="payment_method" required style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+            <label for="payment_method">Select Payment Method</label>
+            <select name="payment_method" id="payment_method" required class="form-select">
                 {% for value, label in payment_methods %}
                     <option value="{{ value }}">{{ label }}</option>
                 {% endfor %}
             </select>
         </div>
-
-        <button id="place-order-btn" type="submit" style="width: 100%; padding: 12px; background-color:#3b5d50; color: white; border: none; border-radius: 5px; font-size: 16px;">
-    Place Order
-    <span id="loading-spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-</button>
-
+        <button id="place-order-btn" type="submit" class="btn btn-dark w-100" style="width: 100%; padding: 12px; background-color:#3b5d50; color: white; border: none; border-radius: 5px; font-size: 16px;">
+            Place Order
+            <span id="loading-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+        </button>
     </form>
 </div>
 
-{% comment %} toast div {% endcomment %}
-<div aria-live="polite" aria-atomic="true" class="position-relative">
-  <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
-    <div id="checkout-toast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body" id="toast-message">Order placed!</div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
+<!-- Toast -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+  <div id="checkout-toast" class="toast text-white bg-success border-0" role="alert">
+    <div class="d-flex">
+      <div class="toast-body" id="toast-message">Order placed!</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
     </div>
   </div>
 </div>
 
-{% comment %}  {% endcomment %}
+<!-- Razorpay Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
 function showToast(message, type) {
     const toast = document.getElementById("checkout-toast");
     const toastMessage = document.getElementById("toast-message");
     toastMessage.textContent = message;
-
-    toast.classList.remove("bg-success", "bg-danger", "bg-warning");
+    toast.classList.remove("bg-success", "bg-danger");
     toast.classList.add("bg-" + type);
-
-    const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
-    bsToast.show();
+    new bootstrap.Toast(toast, { delay: 3000 }).show();
 }
 
 document.getElementById("checkoutForm").addEventListener("submit", function(e) {
     e.preventDefault();
-
     const button = document.getElementById("place-order-btn");
     const spinner = document.getElementById("loading-spinner");
-    const formData = new FormData(this);
+    const form = this;
+    const formData = new FormData(form);
+    const selectedMethod = formData.get("payment_method");
 
-    // Show loading spinner and disable button
     button.disabled = true;
-    spinner.style.display = "inline-block";
+    spinner.classList.remove("d-none");
 
     fetch("{% url 'checkout' %}", {
         method: "POST",
         body: formData,
         headers: {
-            "X-CSRFToken": formData.get("csrfmiddlewaretoken"),
+            "X-CSRFToken": formData.get("csrfmiddlewaretoken")
         }
     })
     .then(response => response.json())
     .then(data => {
-        // Hide spinner and re-enable button
+        spinner.classList.add("d-none");
         button.disabled = false;
-        spinner.style.display = "none";
 
-        if (data.success) {
-            showToast("Order placed! Redirecting to rate your books...", "success");
+        if (selectedMethod !== "cod" && data.razorpay) {
+            const options = {
+                key: data.razorpay_key,
+                amount: data.amount,
+                currency: data.currency,
+                name: "MyBookstall",
+                description: "Book Purchase",
+                order_id: data.order_id,
+                handler: function (response) {
+                    fetch("{% url 'razorpay_order_confirm' %}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": formData.get("csrfmiddlewaretoken"),
+                        },
+                        body: JSON.stringify({
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_signature: response.razorpay_signature,
+                            payment_method: selectedMethod
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.success) {
+                            window.location.href = result.redirect_url;
+                        } else {
+                            showToast("Payment succeeded, but order failed!", "danger");
+                        }
+                    });
+                },
+                prefill: {
+                    name: data.user_name || "",
+                    email: data.user_email || ""
+                },
+                theme: {
+                    color: "#3b5d50"
+                }
+            };
+            const rzp = new Razorpay(options);
+            rzp.open();
+        } else if (data.success) {
+            showToast("Order placed successfully!", "success");
             setTimeout(() => {
                 window.location.href = data.redirect_url;
             }, 2000);
         } else {
-            showToast(data.message || "Order failed.", "danger");
+            showToast(data.message || "Checkout failed!", "danger");
         }
     })
     .catch(() => {
+        spinner.classList.add("d-none");
         button.disabled = false;
-        spinner.style.display = "none";
-        showToast("An unexpected error occurred.", "danger");
+        showToast("Unexpected error occurred!", "danger");
     });
-});
-</script>
-
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const stars = document.querySelectorAll(".star");
-
-  stars.forEach(star => {
-    star.addEventListener("click", function () {
-      const selectedValue = this.getAttribute("data-value");
-      const bookId = this.getAttribute("data-book");
-
-      // Update hidden input
-      document.getElementById(`rating-input-${bookId}`).value = selectedValue;
-
-      // Reset all stars for this book
-      const bookStars = document.querySelectorAll(`.star[data-book="${bookId}"]`);
-      bookStars.forEach(s => {
-        s.style.color = "lightgray";
-      });
-
-      // Highlight selected stars
-      for (let i = 0; i < selectedValue; i++) {
-        bookStars[i].style.color = "gold";
-      }
-    });
-  });
 });
 </script>
 

@@ -18,7 +18,12 @@ from bookstall.utils import EmailThread
 import uuid
 from django.contrib.auth import update_session_auth_hash
 from django.http import Http404
-
+import requests
+import razorpay
+from django.conf import settings
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
 
 
@@ -819,10 +824,9 @@ class CheckoutView(View):
             return JsonResponse({'success': False, 'message': 'Your cart is empty'})
 
         total_price = sum(item.book.discounted_price * item.quantity for item in cart_items)
-
-        coupon_code = request.session.get("coupon", {}).get("code")
-        coupon_discount = Decimal(request.session.get("coupon", {}).get("discount", 0.00))
-
+        coupon_data = request.session.get("coupon", {})
+        coupon_code = coupon_data.get("code")
+        coupon_discount = Decimal(coupon_data.get("discount", 0.00))
         final_price = total_price - coupon_discount
 
         payment_method = request.POST.get('payment_method', 'cod')
@@ -839,6 +843,24 @@ class CheckoutView(View):
         except ShippingAddress.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Invalid shipping address selected.'})
 
+        if payment_method in ['credit_card', 'upi', 'bank_transfer']:
+            razorpay_order = razorpay_client.order.create({
+                "amount": int(final_price * 100),
+                "currency": "INR",
+                "payment_capture": "1"
+            })
+
+            return JsonResponse({
+                'razorpay': True,
+                'razorpay_key': settings.RAZORPAY_KEY_ID,
+                'order_id': razorpay_order['id'],
+                'amount': int(final_price * 100),
+                'currency': "INR",
+                'user_email': user.email,
+                'user_name': user.first_name,
+                'payment_method': payment_method
+            })
+
         order = BookOrder.objects.create(
             user=user,
             profile=profile,
@@ -848,7 +870,7 @@ class CheckoutView(View):
             total_price=final_price,
             coupon_code=coupon_code,
             coupon_amount=coupon_discount,
-            shipping_address=shipping_address  
+            shipping_address=shipping_address
         )
 
         for item in cart_items:
@@ -858,7 +880,6 @@ class CheckoutView(View):
                     'success': False,
                     'message': f"Only {book.quantity} unit(s) available for {book.title}."
                 })
-
             book.quantity -= item.quantity
             book.save()
             order.books.add(book)
@@ -870,41 +891,151 @@ class CheckoutView(View):
         user_name = user.first_name or user.email
 
         EmailThread(
-            subject=f"Order Confirmation - {order.order_id}",
+            subject=f"🛒 Your Order #{order.order_id} Has Been Confirmed - MyBookstall",
             message=f"""
             <html>
-            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                <h2 style="color: #2d89ef;">Order Confirmation</h2>
-                <p>Dear <strong>{user_name}</strong>,</p>
-                <p>Thank you for your order! Here are your order details:</p>
-                <table style="border-collapse: collapse; margin-top: 10px;">
-                    <tr>
-                        <td style="padding: 8px; font-weight: bold;">Order ID:</td>
-                        <td style="padding: 8px;">{order.order_id}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px; font-weight: bold;">Total Amount:</td>
-                        <td style="padding: 8px;">${order.total_price}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px; font-weight: bold;">Payment Method:</td>
-                        <td style="padding: 8px;">{order.payment_method.title()}</td>
-                    </tr>
+            <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+            <div style="max-width: 600px; margin: auto; background: #ffffff; padding: 20px; border-radius: 8px;">
+                <h2 style="color: #2d89ef; text-align: center;">Order Confirmation</h2>
+                <p>Hi <strong>{user_name}</strong>,</p>
+
+                <p>Thank you for shopping with <strong>MyBookstall</strong>! Your order has been successfully placed. Below are the details:</p>
+
+                <table style="width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 20px;">
+                <tr>
+                    <td style="padding: 10px; font-weight: bold; background-color: #f2f2f2;">Order ID</td>
+                    <td style="padding: 10px;">{order.order_id}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; font-weight: bold; background-color: #f2f2f2;">Total Amount</td>
+                    <td style="padding: 10px;">₹{order.total_price}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; font-weight: bold; background-color: #f2f2f2;">Payment Method</td>
+                    <td style="padding: 10px;">{order.payment_method.title()}</td>
+                </tr>
                 </table>
-                <p>We will notify you once your order is shipped.</p>
-                <p>Best regards,<br><strong>MyBookstall Team</strong></p>
+
+                <p style="margin-top: 30px;">If you have any questions or need support, feel free to <a href="mailto:support@mybookstall.com">contact us</a>.</p>
+
+                <p>Best regards,<br>
+                <strong>The MyBookstall Team</strong></p>
+
+                <hr style="margin-top: 40px; border: none; border-top: 1px solid #ddd;">
+                <p style="font-size: 12px; color: #888; text-align: center;">This is an automated message. Please do not reply to this email.</p>
+            </div>
             </body>
             </html>
             """,
             recipient_list=[user.email],
         ).start()
-
         return JsonResponse({
             'success': True,
             'order_id': order.order_id,
             'redirect_url': reverse('rate_order_books', args=[order.id])
         })
     
+
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class RazorpayOrderConfirmView(View):
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        user = request.user
+        profile = Userprofile.objects.get(user=user)
+        cart_items = CartItem.objects.filter(cart__user=user)
+
+        if not cart_items.exists():
+            return JsonResponse({'success': False, 'message': 'Cart is empty.'})
+
+        total_price = sum(item.book.discounted_price * item.quantity for item in cart_items)
+        coupon_data = request.session.get("coupon", {})
+        coupon_discount = Decimal(coupon_data.get("discount", 0.00))
+        final_price = total_price - coupon_discount
+
+        try:
+            shipping_address = ShippingAddress.objects.get(
+                id=request.session.get("selected_shipping_address"),
+                user=user
+            )
+        except ShippingAddress.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Invalid shipping address'})
+
+        order = BookOrder.objects.create(
+            user=user,
+            profile=profile,
+            order_id=str(uuid.uuid4()).replace('-', '')[:12],
+            payment_method=data.get("payment_method"),
+            is_paid=True,
+            total_price=final_price,
+            coupon_code=coupon_data.get("code"),
+            coupon_amount=coupon_discount,
+            shipping_address=shipping_address
+        )
+
+        for item in cart_items:
+            book = item.book
+            if book.quantity >= item.quantity:
+                book.quantity -= item.quantity
+                book.save()
+                order.books.add(book)
+
+        cart_items.delete()
+        request.session.pop("coupon", None)
+        request.session.pop("selected_shipping_address", None)
+
+        user_name = user.first_name or user.email
+
+        EmailThread(
+            subject=f"🛒 Your Order #{order.order_id} Has Been Confirmed - MyBookstall",
+            message=f"""
+            <html>
+            <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+            <div style="max-width: 600px; margin: auto; background: #ffffff; padding: 20px; border-radius: 8px;">
+                <h2 style="color: #2d89ef; text-align: center;">Order Confirmation</h2>
+                <p>Hi <strong>{user_name}</strong>,</p>
+
+                <p>Thank you for shopping with <strong>MyBookstall</strong>! Your order has been successfully placed. Below are the details:</p>
+
+                <table style="width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 20px;">
+                <tr>
+                    <td style="padding: 10px; font-weight: bold; background-color: #f2f2f2;">Order ID</td>
+                    <td style="padding: 10px;">{order.order_id}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; font-weight: bold; background-color: #f2f2f2;">Total Amount</td>
+                    <td style="padding: 10px;">₹{order.total_price}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; font-weight: bold; background-color: #f2f2f2;">Payment Method</td>
+                    <td style="padding: 10px;">{order.payment_method.title()}</td>
+                </tr>
+                </table>
+
+                <p>You'll receive another email once your order has been shipped.</p>
+
+                <p style="margin-top: 30px;">If you have any questions or need support, feel free to <a href="mailto:support@mybookstall.com">contact us</a>.</p>
+
+                <p>Best regards,<br>
+                <strong>The MyBookstall Team</strong></p>
+
+                <hr style="margin-top: 40px; border: none; border-top: 1px solid #ddd;">
+                <p style="font-size: 12px; color: #888; text-align: center;">This is an automated message. Please do not reply to this email.</p>
+            </div>
+            </body>
+            </html>
+            """,
+            recipient_list=[user.email],
+        ).start()
+
+
+        return JsonResponse({
+            'success': True,
+            'redirect_url': reverse('rate_order_books', args=[order.id])
+        })
+
+
 
 class TrackOrderView(View):
     def get(self,request,*args, **kwargs):
@@ -1122,3 +1253,27 @@ class UserChatModalView(View):
             "room_name": room_name,
             "messages": messages,
         })
+    
+
+class CurrencyConvertView(View):
+    def get(self,request):
+        if 'amount' in request.GET and 'currency' in request.GET:    
+            try:
+                amount=float(request.GET.get('amount',0))
+                target_currency=request.GET.get('currency','USD')
+                url="https://api.exchangerate-api.com/v4/latest/INR"
+                response=requests.get(url)
+                data=response.json()
+                if target_currency not in data['rates']:
+                    return JsonResponse({'error':'invalid currency'})
+                rate=data['rates'][target_currency]
+                converted=round(amount * rate,2)
+                return JsonResponse({
+                    'converted_price':converted,
+                    'currency':target_currency,
+                    'rate':rate
+                })
+            except Exception as e:
+                return JsonResponse({'error':str(e)})
+        return render(request,'mybookstall/otherfiles/convert_currency.html')    
+            

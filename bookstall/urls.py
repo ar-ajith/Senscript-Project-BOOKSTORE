@@ -27,6 +27,7 @@ urlpatterns = [
     path('coupons/add/', CouponCreateView.as_view(), name='coupon_create'),
     path('coupons/update/<int:pk>/', CouponUpdateView.as_view(), name='coupon_update'),
     path('coupons/delete/<int:pk>/', CouponDeleteView.as_view(), name='coupon_delete'),
+    path('books/delete/<int:pk>/', BookDeleteView.as_view(), name='delete_book'),
     path('forgot-password/', ForgotPasswordView.as_view(), name='forgot_password'),
     path('password-reset-done/', PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('reset-password/<uidb64>/<token>/', ResetPasswordView.as_view(), name='reset_password'),
@@ -41,4 +42,5 @@ urlpatterns = [
     path("logout/",LogoutView.as_view(),name="logout"),
     path("chats/", AdminChatListView.as_view(), name="admin_chat_list"),
     path("chat/<int:user_id>/", AdminChatView.as_view(), name="admin_chat_view"),
+    path('seller/chat/modal/', SellerChatModalView.as_view(), name='seller_chat_modal'),
     ]

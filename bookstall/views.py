@@ -794,6 +794,11 @@ class CouponDeleteView(View):
         coupon.delete()
         return redirect('coupon_list')
     
+class BookDeleteView(View):
+    def post(self, request, pk):
+        book = get_object_or_404(Book, pk=pk)
+        book.delete()
+        return redirect('book_list')    
 
 
 class BookOrderListView(ListView):
@@ -967,7 +972,10 @@ class AdminChatListView(View):
 class AdminChatView(View):
     def get(self, request, user_id):
         user = CustomUser.objects.get(id=user_id)
-        room_name = f"user_{user.id}_admin"
+        if user.role == 'user':
+            room_name = f"user_{user.id}_admin"
+        else:
+            room_name = f"seller_{user.id}_admin"
         room, _ = ChatRoom.objects.get_or_create(room_name=room_name)
         messages = ChatMessage.objects.filter(room=room)
         return render(request, "chat.html", {
@@ -975,6 +983,18 @@ class AdminChatView(View):
             "messages": messages,
             "target_user": user,
         })
+
+class SellerChatModalView(View):
+    def get(self, request):
+        user = request.user
+        room_name = f"seller_{user.id}_admin" 
+        room, _ = ChatRoom.objects.get_or_create(room_name=room_name)
+        messages = ChatMessage.objects.filter(room=room)
+        return render(request, "mybookstall/otherfiles/chat_modal.html", {
+            "room_name": room_name,
+            "messages": messages,
+        })
+
 
 class LogoutView(View):
     def get(self, request):
